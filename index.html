@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Image Compositor</title>
+    
+    <!-- PWA Offline Support -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#121212">
+    <link rel="apple-touch-icon" href="logo.png">
+
+    <style>
+        body {
+            background-color: #121212;
+            color: #ffffff;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin: 10px;
+            font-family: Arial, sans-serif;
+            overflow-x: hidden;
+        }
+        .logo {
+            width: 90%;
+            max-width: 400px;
+            margin-bottom: 20px;
+        }
+        .container {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            width: 100%;
+            max-width: 600px;
+            gap: 15px;
+        }
+        .upload-box {
+            border: 2px dashed #ffffff;
+            padding: 15px;
+            text-align: center;
+            width: 100%;
+            box-sizing: border-box;
+            background-color: #1e1e1e;
+            border-radius: 8px;
+        }
+        @media (min-width: 600px) {
+            .upload-box {
+                width: 47%;
+            }
+        }
+        canvas {
+            border: 1px solid #ccc;
+            margin-top: 20px;
+            background-color: #333;
+            max-width: 100%;
+            height: auto;
+            touch-action: none; /* Prevent scrolling when dragging on canvas */
+            border-radius: 8px;
+        }
+        button {
+            background-color: #e91e63;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            cursor: pointer;
+            border-radius: 6px;
+            font-size: 16px;
+            font-weight: bold;
+            transition: background-color 0.2s;
+            touch-action: manipulation;
+        }
+        button:hover, button:active {
+            background-color: #d81b60;
+        }
+        #resetBtn {
+            background-color: #ff9800;
+        }
+        #resetBtn:hover, #resetBtn:active {
+            background-color: #fb8c00;
+        }
+        .controls-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 20px;
+            align-items: center;
+            margin-top: 20px;
+            width: 100%;
+            max-width: 400px;
+        }
+        .movement-controls {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 5px;
+        }
+        .horizontal-controls {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+        }
+        .movement-controls button {
+            padding: 12px 18px;
+            font-size: 20px;
+        }
+        .zoom-controls {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .mask-controls {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+            width: 100%;
+            background: #1e1e1e;
+            padding: 15px;
+            border-radius: 8px;
+            box-sizing: border-box;
+        }
+        input[type="range"] {
+            width: 80%;
+            height: 8px;
+            background: #555;
+            outline: none;
+            border-radius: 4px;
+        }
+        .action-buttons {
+            margin-top: 20px;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 15px;
+            width: 100%;
+            margin-bottom: 40px;
+        }
+        .action-buttons button {
+            flex: 1;
+            min-width: 140px;
+            max-width: 250px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Replace src with your logo data or ensure logo.png is alongside this file -->
+    <img src="logo.png" alt="Logo" class="logo" />
+    
+    <div class="container">
+        <div class="upload-box">
+            <h3>1. Background</h3>
+            <p style="font-size: 14px; color: #aaa;">Upload the template</p>
+            <input type="file" id="templateUpload" accept="image/*" style="width: 100%;">
+        </div>
+        <div class="upload-box">
+            <h3>2. Face / Fill</h3>
+            <p style="font-size: 14px; color: #aaa;">Image for the circle</p>
+            <input type="file" id="overlayUpload" accept="image/*" style="width: 100%;">
+        </div>
+    </div>
+    
+    <p style="color: #4CAF50; font-size: 14px; margin-top: 20px; font-weight: bold; text-align: center;">💡 Tip: You can drag the circle image directly on the canvas!</p>
+    
+    <canvas id="imageCanvas" width="400" height="400"></canvas>
+    
+    <div class="controls-container">
+        <!-- Mask Size Control -->
+        <div class="mask-controls">
+            <label for="maskRadiusSlider" style="font-weight: bold;">Circle Size</label>
+            <input type="range" id="maskRadiusSlider" min="50" max="200" value="95">
+        </div>
+
+        <!-- Zoom Controls -->
+        <div class="zoom-controls">
+            <button id="zoomInBtn">🔍 Zoom In</button>
+            <button id="zoomOutBtn">➖ Zoom Out</button>
+        </div>
+
+        <!-- Movement Arrows (Optional now that dragging works, but good for precision) -->
+        <div class="movement-controls">
+            <button id="upBtn">⬆</button>
+            <div class="horizontal-controls">
+                <button id="leftBtn">⬅</button>
+                <button id="rightBtn">➡</button>
+            </div>
+            <button id="downBtn">⬇</button>
+        </div>
+    </div>
+
+    <div class="action-buttons">
+        <button id="downloadBtn">📥 Download</button>
+        <button id="resetBtn">🔄 Reset</button>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('imageCanvas');
+        const context = canvas.getContext('2d');
+        
+        let templateImg = null;
+        let overlayImg = null;
+        let overlayPosition = { x: 0, y: 0 };
+        let overlayScale = 1;
+        let maskRadius = 95;
+
+        // Touch/Drag State
+        let isDragging = false;
+        let dragStartX = 0;
+        let dragStartY = 0;
+
+        document.getElementById('templateUpload').addEventListener('change', handleTemplateUpload);
+        document.getElementById('overlayUpload').addEventListener('change', handleOverlayUpload);
+        document.getElementById('downloadBtn').addEventListener('click', downloadImage);
+        document.getElementById('resetBtn').addEventListener('click', resetCanvas);
+        
+        document.getElementById('maskRadiusSlider').addEventListener('input', (e) => {
+            maskRadius = parseInt(e.target.value, 10);
+            drawCanvas();
+        });
+
+        // Movement Control
+        document.getElementById('upBtn').addEventListener('click', () => moveImage(0, -15));
+        document.getElementById('downBtn').addEventListener('click', () => moveImage(0, 15));
+        document.getElementById('leftBtn').addEventListener('click', () => moveImage(-15, 0));
+        document.getElementById('rightBtn').addEventListener('click', () => moveImage(15, 0));
+
+        // Zoom Control
+        document.getElementById('zoomInBtn').addEventListener('click', () => zoomImage(1.1));
+        document.getElementById('zoomOutBtn').addEventListener('click', () => zoomImage(0.9));
+
+        function handleTemplateUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            templateImg = new Image();
+            templateImg.onload = () => {
+                drawCanvas();
+            };
+            templateImg.src = URL.createObjectURL(file);
+        }
+
+        function handleOverlayUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            overlayImg = new Image();
+            overlayImg.onload = () => {
+                const minDimension = Math.min(overlayImg.width, overlayImg.height);
+                overlayScale = (maskRadius * 2) / minDimension;
+                overlayPosition.x = (canvas.width - (overlayImg.width * overlayScale)) / 2;
+                overlayPosition.y = (canvas.height - (overlayImg.height * overlayScale)) / 2;
+                drawCanvas();
+            };
+            overlayImg.src = URL.createObjectURL(file);
+        }
+
+        function drawCanvas() {
+            context.clearRect(0, 0, canvas.width, canvas.height);
+
+            if (templateImg) {
+                context.drawImage(templateImg, 0, 0, canvas.width, canvas.height);
+            }
+
+            if (overlayImg) {
+                context.save();
+                context.beginPath();
+                context.arc(canvas.width / 2, canvas.height / 2, maskRadius, 0, Math.PI * 2);
+                context.clip();
+                
+                context.drawImage(
+                    overlayImg, 
+                    overlayPosition.x, 
+                    overlayPosition.y, 
+                    overlayImg.width * overlayScale, 
+                    overlayImg.height * overlayScale
+                );
+                context.restore();
+            }
+        }
+
+        function moveImage(dx, dy) {
+            if (!overlayImg) return;
+            overlayPosition.x += dx;
+            overlayPosition.y += dy;
+            drawCanvas();
+        }
+
+        function zoomImage(factor) {
+            if (!overlayImg) return;
+            const centerX = canvas.width / 2;
+            const centerY = canvas.height / 2;
+            overlayPosition.x = centerX - (centerX - overlayPosition.x) * factor;
+            overlayPosition.y = centerY - (centerY - overlayPosition.y) * factor;
+            overlayScale *= factor;
+            drawCanvas();
+        }
+
+        function downloadImage() {
+            if (!templateImg && !overlayImg) return alert("Nothing to download yet!");
+            const link = document.createElement('a');
+            link.download = 'composed-image.png';
+            link.href = canvas.toDataURL('image/png');
+            link.click();
+        }
+
+        function resetCanvas() {
+            context.clearRect(0, 0, canvas.width, canvas.height);
+            document.getElementById('templateUpload').value = '';
+            document.getElementById('overlayUpload').value = '';
+            templateImg = null;
+            overlayImg = null;
+            overlayPosition = { x: 0, y: 0 };
+            overlayScale = 1;
+            maskRadius = 95;
+            document.getElementById('maskRadiusSlider').value = 95;
+        }
+
+        // --- Touch & Drag Logic ---
+        function getPointerPos(e) {
+            const rect = canvas.getBoundingClientRect();
+            // Scale pointer coordinates if the canvas CSS size differs from its internal width/height
+            const scaleX = canvas.width / rect.width;
+            const scaleY = canvas.height / rect.height;
+            
+            let clientX = e.clientX;
+            let clientY = e.clientY;
+
+            if (e.touches && e.touches.length > 0) {
+                clientX = e.touches[0].clientX;
+                clientY = e.touches[0].clientY;
+            }
+
+            return {
+                x: (clientX - rect.left) * scaleX,
+                y: (clientY - rect.top) * scaleY
+            };
+        }
+
+        function handleDragStart(e) {
+            if (!overlayImg) return;
+            isDragging = true;
+            const pos = getPointerPos(e);
+            dragStartX = pos.x;
+            dragStartY = pos.y;
+            e.preventDefault(); // Prevent scrolling
+        }
+
+        function handleDragMove(e) {
+            if (!isDragging || !overlayImg) return;
+            const pos = getPointerPos(e);
+            const dx = pos.x - dragStartX;
+            const dy = pos.y - dragStartY;
+            
+            overlayPosition.x += dx;
+            overlayPosition.y += dy;
+            
+            dragStartX = pos.x;
+            dragStartY = pos.y;
+            
+            drawCanvas();
+            e.preventDefault(); // Prevent scrolling
+        }
+
+        function handleDragEnd(e) {
+            isDragging = false;
+        }
+
+        // Mouse Events
+        canvas.addEventListener('mousedown', handleDragStart);
+        window.addEventListener('mousemove', handleDragMove);
+        window.addEventListener('mouseup', handleDragEnd);
+
+        // Touch Events
+        canvas.addEventListener('touchstart', handleDragStart, { passive: false });
+        window.addEventListener('touchmove', handleDragMove, { passive: false });
+        window.addEventListener('touchend', handleDragEnd);
+
+        // --- PWA Offline Support ---
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('sw.js').then(registration => {
+                    console.log('ServiceWorker registration successful');
+                }, err => {
+                    console.log('ServiceWorker registration failed: ', err);
+                });
+            });
+        }
+    </script>
+</body>
+</html>
