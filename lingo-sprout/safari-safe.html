@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>Lingo Sprout Safe</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #f7f5ff;
+      color: #2f2853;
+    }
+    .app {
+      max-width: 420px;
+      margin: 0 auto;
+      padding: 16px 16px 96px;
+    }
+    .card {
+      background: #ffffff;
+      border-radius: 20px;
+      padding: 16px;
+      margin-bottom: 14px;
+      box-shadow: 0 6px 18px rgba(0,0,0,0.08);
+    }
+    h1, h2, p { margin-top: 0; }
+    .hero {
+      text-align: center;
+    }
+    .hero img {
+      width: 88px;
+      height: 88px;
+      display: block;
+      margin: 0 auto 12px;
+    }
+    .word {
+      font-size: 42px;
+      text-align: center;
+      margin: 12px 0;
+    }
+    .english {
+      font-size: 28px;
+      font-weight: bold;
+      text-align: center;
+    }
+    .vietnamese {
+      font-size: 20px;
+      text-align: center;
+      color: #6a58aa;
+      margin-top: 8px;
+    }
+    .example {
+      margin-top: 12px;
+      text-align: center;
+      background: #f3efff;
+      border-radius: 14px;
+      padding: 10px;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+    button {
+      border: 0;
+      border-radius: 16px;
+      padding: 14px;
+      font-size: 16px;
+      font-weight: bold;
+      background: #ffffff;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+      color: #2f2853;
+    }
+    .primary { background: #8fe8cc; }
+    .secondary { background: #ffd78d; }
+    .pink { background: #ffb8d5; }
+    .blue { background: #b8d4ff; }
+    .lesson-list button {
+      width: 100%;
+      text-align: left;
+      margin-bottom: 10px;
+      background: #fff;
+    }
+    .feedback {
+      text-align: center;
+      font-weight: bold;
+      color: #5f5887;
+    }
+    .bottom {
+      position: fixed;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: #ffffff;
+      padding: 12px;
+      box-shadow: 0 -4px 14px rgba(0,0,0,0.08);
+    }
+    .bottom .grid {
+      max-width: 420px;
+      margin: 0 auto;
+      grid-template-columns: 80px 1fr 80px;
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <div class="card hero">
+      <img src="./sophia-avatar.svg" alt="Sophia avatar" />
+      <h1 id="hello">Hello, Sophia!</h1>
+      <p>Simple Safari-safe learning test version.</p>
+    </div>
+
+    <div class="card">
+      <h2>Lessons</h2>
+      <div class="lesson-list" id="lessonList"></div>
+    </div>
+
+    <div class="card" id="wordCard">
+      <div class="word" id="emoji">👋</div>
+      <div class="english" id="english">hello</div>
+      <div class="vietnamese" id="vietnamese">xin chào</div>
+      <div class="example" id="example">Hello, my friend!</div>
+    </div>
+
+    <div class="card">
+      <div class="grid">
+        <button class="primary" id="speakEnglish">🔊 Hear English</button>
+        <button class="secondary" id="speakVietnamese">🗣️ Hear Vietnamese</button>
+        <button class="pink" id="markLearned">✅ I know this</button>
+        <button class="blue" id="nextWord">➡️ Next word</button>
+      </div>
+    </div>
+
+    <div class="card feedback" id="feedback">Tap a button to test the app.</div>
+  </div>
+
+  <div class="bottom">
+    <div class="grid">
+      <button id="prevBtn">⬅️</button>
+      <button class="primary" id="bottomSpeak">🔊 Say it</button>
+      <button id="nextBtn">➡️</button>
+    </div>
+  </div>
+
+  <script>
+    const lessons = [
+      {
+        label: 'Greetings',
+        words: [
+          { english: 'hello', vietnamese: 'xin chào', emoji: '👋', example: 'Hello, my friend!' },
+          { english: 'goodbye', vietnamese: 'tạm biệt', emoji: '👋', example: 'Goodbye! See you soon.' },
+          { english: 'thank you', vietnamese: 'cảm ơn', emoji: '🙏', example: 'Thank you very much.' }
+        ]
+      },
+      {
+        label: 'Family',
+        words: [
+          { english: 'mum', vietnamese: 'mẹ', emoji: '👩', example: 'My mum is kind.' },
+          { english: 'dad', vietnamese: 'bố', emoji: '👨', example: 'My dad is funny.' },
+          { english: 'sister', vietnamese: 'chị/em gái', emoji: '👧', example: 'My sister can sing.' }
+        ]
+      },
+      {
+        label: 'Food',
+        words: [
+          { english: 'apple', vietnamese: 'táo', emoji: '🍎', example: 'I like apples.' },
+          { english: 'rice', vietnamese: 'cơm', emoji: '🍚', example: 'Rice is warm.' },
+          { english: 'milk', vietnamese: 'sữa', emoji: '🥛', example: 'I drink milk.' }
+        ]
+      }
+    ];
+
+    let lessonIndex = 0;
+    let wordIndex = 0;
+    let stars = 0;
+
+    const lessonList = document.getElementById('lessonList');
+    const emoji = document.getElementById('emoji');
+    const english = document.getElementById('english');
+    const vietnamese = document.getElementById('vietnamese');
+    const example = document.getElementById('example');
+    const feedback = document.getElementById('feedback');
+    const hello = document.getElementById('hello');
+
+    function currentWord() {
+      return lessons[lessonIndex].words[wordIndex];
+    }
+
+    function renderLessons() {
+      lessonList.innerHTML = '';
+      for (let i = 0; i < lessons.length; i++) {
+        const btn = document.createElement('button');
+        btn.textContent = lessons[i].label;
+        btn.onclick = function () {
+          lessonIndex = i;
+          wordIndex = 0;
+          renderWord();
+          feedback.textContent = 'Loaded ' + lessons[i].label + '.';
+        };
+        lessonList.appendChild(btn);
+      }
+    }
+
+    function renderWord() {
+      const word = currentWord();
+      emoji.textContent = word.emoji;
+      english.textContent = word.english;
+      vietnamese.textContent = word.vietnamese;
+      example.textContent = word.example;
+      hello.textContent = 'Hello, Sophia! ⭐ ' + stars;
+    }
+
+    function speakText(text, lang) {
+      if (!window.speechSynthesis) {
+        feedback.textContent = 'Speech is not available in this browser.';
+        return;
+      }
+      const utterance = new SpeechSynthesisUtterance(text);
+      utterance.lang = lang;
+      utterance.rate = 0.9;
+      window.speechSynthesis.cancel();
+      window.speechSynthesis.speak(utterance);
+    }
+
+    function nextWord() {
+      wordIndex = wordIndex + 1;
+      if (wordIndex >= lessons[lessonIndex].words.length) wordIndex = 0;
+      renderWord();
+      feedback.textContent = 'Next word.';
+    }
+
+    function prevWord() {
+      wordIndex = wordIndex - 1;
+      if (wordIndex < 0) wordIndex = lessons[lessonIndex].words.length - 1;
+      renderWord();
+      feedback.textContent = 'Previous word.';
+    }
+
+    document.getElementById('speakEnglish').onclick = function () {
+      speakText(currentWord().english, 'en-GB');
+      feedback.textContent = 'Playing English.';
+    };
+
+    document.getElementById('speakVietnamese').onclick = function () {
+      speakText(currentWord().vietnamese, 'vi-VN');
+      feedback.textContent = 'Playing Vietnamese.';
+    };
+
+    document.getElementById('markLearned').onclick = function () {
+      stars = stars + 1;
+      renderWord();
+      feedback.textContent = 'Nice! Sophia earned a star.';
+    };
+
+    document.getElementById('nextWord').onclick = nextWord;
+    document.getElementById('prevBtn').onclick = prevWord;
+    document.getElementById('nextBtn').onclick = nextWord;
+    document.getElementById('bottomSpeak').onclick = function () {
+      speakText(currentWord().english, 'en-GB');
+      feedback.textContent = 'Playing English.';
+    };
+
+    renderLessons();
+    renderWord();
+  </script>
+</body>
+</html>

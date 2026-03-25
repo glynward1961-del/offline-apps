@@ -1,0 +1,22 @@
+{
+  "name": "Lingo Sprout",
+  "short_name": "Sprout",
+  "description": "A playful English learning app with Vietnamese support for young children.",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#fff4d9",
+  "theme_color": "#7d5cff",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "./sophia-avatar.svg",
+      "sizes": "256x256",
+      "type": "image/svg+xml"
+    },
+    {
+      "src": "./icon-512.svg",
+      "sizes": "512x512",
+      "type": "image/svg+xml"
+    }
+  ]
+}
