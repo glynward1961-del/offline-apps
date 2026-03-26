@@ -4,16 +4,30 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Image Compositor</title>
-    
-    <!-- PWA Offline Support -->
+
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#121212">
     <link rel="apple-touch-icon" href="logo.png">
 
     <style>
+        :root {
+            --bg: #121212;
+            --panel: #1e1e1e;
+            --panel-2: #252525;
+            --text: #ffffff;
+            --muted: #b8b8b8;
+            --accent: #e91e63;
+            --accent-2: #ff9800;
+            --line: rgba(255,255,255,0.14);
+            --guide: rgba(76, 175, 80, 0.95);
+            --guide-soft: rgba(76, 175, 80, 0.35);
+        }
+
+        * { box-sizing: border-box; }
+
         body {
-            background-color: #121212;
-            color: #ffffff;
+            background-color: var(--bg);
+            color: var(--text);
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -21,211 +35,417 @@
             font-family: Arial, sans-serif;
             overflow-x: hidden;
         }
+
         .logo {
             width: 90%;
             max-width: 400px;
-            margin-bottom: 20px;
+            margin-bottom: 16px;
         }
+
         .container {
             display: flex;
             justify-content: center;
             flex-wrap: wrap;
             width: 100%;
-            max-width: 600px;
-            gap: 15px;
+            max-width: 1100px;
+            gap: 18px;
+            align-items: flex-start;
         }
-        .upload-box {
-            border: 2px dashed #ffffff;
-            padding: 15px;
-            text-align: center;
+
+        .left-column,
+        .right-column {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
             width: 100%;
-            box-sizing: border-box;
-            background-color: #1e1e1e;
-            border-radius: 8px;
         }
-        @media (min-width: 600px) {
-            .upload-box {
-                width: 47%;
+
+        .left-column { max-width: 640px; }
+        .right-column { max-width: 420px; }
+
+        .panel {
+            background: var(--panel);
+            border: 1px solid var(--line);
+            border-radius: 14px;
+            padding: 16px;
+            width: 100%;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.22);
+        }
+
+        .upload-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 14px;
+        }
+
+        @media (min-width: 700px) {
+            .upload-grid {
+                grid-template-columns: 1fr 1fr;
             }
         }
+
+        .upload-box {
+            border: 2px dashed rgba(255,255,255,0.22);
+            padding: 15px;
+            text-align: center;
+            background-color: var(--panel-2);
+            border-radius: 10px;
+        }
+
+        .upload-box h3 {
+            margin: 0 0 8px;
+        }
+
+        .upload-box p,
+        .helper,
+        .value-label,
+        .status-line {
+            font-size: 14px;
+            color: var(--muted);
+        }
+
+        .tip {
+            color: #7ee787;
+            font-size: 14px;
+            font-weight: bold;
+            text-align: center;
+            margin: 0;
+        }
+
+        .canvas-wrap {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
         canvas {
-            border: 1px solid #ccc;
-            margin-top: 20px;
+            border: 1px solid rgba(255,255,255,0.15);
             background-color: #333;
             max-width: 100%;
             height: auto;
-            touch-action: none; /* Prevent scrolling when dragging on canvas */
-            border-radius: 8px;
+            touch-action: none;
+            border-radius: 12px;
+            box-shadow: 0 12px 30px rgba(0,0,0,0.3);
         }
-        button {
-            background-color: #e91e63;
-            color: white;
-            border: none;
-            padding: 12px 20px;
-            cursor: pointer;
-            border-radius: 6px;
-            font-size: 16px;
+
+        .section-title {
+            margin: 0 0 10px;
+            font-size: 18px;
+        }
+
+        .control-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-bottom: 14px;
+            background: var(--panel-2);
+            border-radius: 10px;
+            padding: 12px;
+            border: 1px solid rgba(255,255,255,0.06);
+        }
+
+        .control-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+        }
+
+        .control-header label {
             font-weight: bold;
-            transition: background-color 0.2s;
-            touch-action: manipulation;
         }
-        button:hover, button:active {
-            background-color: #d81b60;
-        }
-        #resetBtn {
-            background-color: #ff9800;
-        }
-        #resetBtn:hover, #resetBtn:active {
-            background-color: #fb8c00;
-        }
-        .controls-container {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-            gap: 20px;
-            align-items: center;
-            margin-top: 20px;
-            width: 100%;
-            max-width: 400px;
-        }
-        .movement-controls {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 5px;
-        }
-        .horizontal-controls {
-            display: flex;
-            justify-content: center;
-            gap: 10px;
-        }
-        .movement-controls button {
-            padding: 12px 18px;
-            font-size: 20px;
-        }
-        .zoom-controls {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
-        .mask-controls {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 10px;
-            width: 100%;
-            background: #1e1e1e;
-            padding: 15px;
-            border-radius: 8px;
-            box-sizing: border-box;
-        }
+
         input[type="range"] {
-            width: 80%;
+            width: 100%;
             height: 8px;
             background: #555;
             outline: none;
             border-radius: 4px;
         }
+
+        button,
+        .toggle {
+            background-color: var(--accent);
+            color: white;
+            border: none;
+            padding: 11px 16px;
+            cursor: pointer;
+            border-radius: 8px;
+            font-size: 15px;
+            font-weight: bold;
+            transition: background-color 0.2s, transform 0.05s;
+            touch-action: manipulation;
+        }
+
+        button:hover,
+        .toggle:hover {
+            background-color: #d81b60;
+        }
+
+        button:active,
+        .toggle:active {
+            transform: translateY(1px);
+        }
+
+        #resetBtn {
+            background-color: var(--accent-2);
+        }
+
+        #resetBtn:hover {
+            background-color: #fb8c00;
+        }
+
+        .button-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 10px;
+        }
+
+        .movement-pad {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            margin-top: 6px;
+        }
+
+        .movement-row {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .movement-pad button {
+            min-width: 54px;
+            padding: 12px 14px;
+            font-size: 18px;
+        }
+
+        .small-actions {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .small-actions button {
+            flex: 1;
+            min-width: 120px;
+        }
+
+        .toggle-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+        }
+
+        .toggle-row input[type="checkbox"] {
+            transform: scale(1.2);
+        }
+
         .action-buttons {
-            margin-top: 20px;
             display: flex;
             flex-wrap: wrap;
             justify-content: center;
-            gap: 15px;
+            gap: 12px;
             width: 100%;
-            margin-bottom: 40px;
         }
+
         .action-buttons button {
             flex: 1;
-            min-width: 140px;
-            max-width: 250px;
+            min-width: 150px;
         }
     </style>
 </head>
 <body>
-    <!-- Replace src with your logo data or ensure logo.png is alongside this file -->
     <img src="logo.png" alt="Logo" class="logo" />
-    
+
     <div class="container">
-        <div class="upload-box">
-            <h3>1. Background</h3>
-            <p style="font-size: 14px; color: #aaa;">Upload the template</p>
-            <input type="file" id="templateUpload" accept="image/*" style="width: 100%;">
-        </div>
-        <div class="upload-box">
-            <h3>2. Face / Fill</h3>
-            <p style="font-size: 14px; color: #aaa;">Image for the circle</p>
-            <input type="file" id="overlayUpload" accept="image/*" style="width: 100%;">
-        </div>
-    </div>
-    
-    <p style="color: #4CAF50; font-size: 14px; margin-top: 20px; font-weight: bold; text-align: center;">💡 Tip: You can drag the circle image directly on the canvas!</p>
-    
-    <canvas id="imageCanvas" width="400" height="400"></canvas>
-    
-    <div class="controls-container">
-        <!-- Mask Size Control -->
-        <div class="mask-controls">
-            <label for="maskRadiusSlider" style="font-weight: bold;">Circle Size</label>
-            <input type="range" id="maskRadiusSlider" min="50" max="200" value="95">
-        </div>
-
-        <!-- Zoom Controls -->
-        <div class="zoom-controls">
-            <button id="zoomInBtn">🔍 Zoom In</button>
-            <button id="zoomOutBtn">➖ Zoom Out</button>
-        </div>
-
-        <!-- Movement Arrows (Optional now that dragging works, but good for precision) -->
-        <div class="movement-controls">
-            <button id="upBtn">⬆</button>
-            <div class="horizontal-controls">
-                <button id="leftBtn">⬅</button>
-                <button id="rightBtn">➡</button>
+        <div class="left-column">
+            <div class="panel">
+                <div class="upload-grid">
+                    <div class="upload-box">
+                        <h3>1. Background</h3>
+                        <p>Upload the template or frame</p>
+                        <input type="file" id="templateUpload" accept="image/*" style="width: 100%;">
+                    </div>
+                    <div class="upload-box">
+                        <h3>2. Face / Fill</h3>
+                        <p>Upload the image for the circle</p>
+                        <input type="file" id="overlayUpload" accept="image/*" style="width: 100%;">
+                    </div>
+                </div>
             </div>
-            <button id="downBtn">⬇</button>
-        </div>
-    </div>
 
-    <div class="action-buttons">
-        <button id="downloadBtn">📥 Download</button>
-        <button id="resetBtn">🔄 Reset</button>
+            <p class="tip">💡 Drag the photo to reposition it. Hold Shift while nudging for bigger moves.</p>
+
+            <div class="panel canvas-wrap">
+                <canvas id="imageCanvas" width="400" height="400"></canvas>
+            </div>
+        </div>
+
+        <div class="right-column">
+            <div class="panel">
+                <h2 class="section-title">Mask & Guide</h2>
+
+                <div class="control-group">
+                    <div class="control-header">
+                        <label for="maskRadiusSlider">Circle Size</label>
+                        <span class="value-label" id="maskRadiusValue">95 px</span>
+                    </div>
+                    <input type="range" id="maskRadiusSlider" min="40" max="220" value="95">
+                </div>
+
+                <div class="control-group">
+                    <div class="control-header">
+                        <label for="featherSlider">Mask Feather</label>
+                        <span class="value-label" id="featherValue">8 px</span>
+                    </div>
+                    <input type="range" id="featherSlider" min="0" max="40" value="8">
+                    <div class="helper">Softens the edge so portraits blend into ornate frames better.</div>
+                </div>
+
+                <div class="control-group">
+                    <div class="toggle-row">
+                        <label for="showGuideToggle">Show Guide Ring</label>
+                        <input type="checkbox" id="showGuideToggle" checked>
+                    </div>
+                    <div class="helper">Green guide helps match the opening in the frame.</div>
+                </div>
+
+                <div class="control-group">
+                    <div class="small-actions">
+                        <button id="centerMaskBtn">Center Mask</button>
+                        <button id="centerImageBtn">Center Photo</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="panel">
+                <h2 class="section-title">Move the Mask</h2>
+                <div class="helper">Use this when the frame opening isn’t perfectly centred.</div>
+                <div class="movement-pad">
+                    <button data-mask-move="up">⬆</button>
+                    <div class="movement-row">
+                        <button data-mask-move="left">⬅</button>
+                        <button data-mask-move="down">⬇</button>
+                        <button data-mask-move="right">➡</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="panel">
+                <h2 class="section-title">Move & Scale the Photo</h2>
+                <div class="button-grid">
+                    <button id="zoomInBtn">🔍 Zoom In</button>
+                    <button id="zoomOutBtn">➖ Zoom Out</button>
+                </div>
+                <div class="movement-pad">
+                    <button data-image-move="up">⬆</button>
+                    <div class="movement-row">
+                        <button data-image-move="left">⬅</button>
+                        <button data-image-move="down">⬇</button>
+                        <button data-image-move="right">➡</button>
+                    </div>
+                </div>
+                <p class="status-line">Nudge buttons use fine steps for cleaner alignment.</p>
+            </div>
+
+            <div class="panel">
+                <div class="action-buttons">
+                    <button id="downloadBtn">📥 Download</button>
+                    <button id="resetBtn">🔄 Reset</button>
+                </div>
+            </div>
+        </div>
     </div>
 
     <script>
         const canvas = document.getElementById('imageCanvas');
         const context = canvas.getContext('2d');
-        
+
+        const templateUpload = document.getElementById('templateUpload');
+        const overlayUpload = document.getElementById('overlayUpload');
+        const downloadBtn = document.getElementById('downloadBtn');
+        const resetBtn = document.getElementById('resetBtn');
+        const zoomInBtn = document.getElementById('zoomInBtn');
+        const zoomOutBtn = document.getElementById('zoomOutBtn');
+        const maskRadiusSlider = document.getElementById('maskRadiusSlider');
+        const featherSlider = document.getElementById('featherSlider');
+        const showGuideToggle = document.getElementById('showGuideToggle');
+        const centerMaskBtn = document.getElementById('centerMaskBtn');
+        const centerImageBtn = document.getElementById('centerImageBtn');
+        const maskRadiusValue = document.getElementById('maskRadiusValue');
+        const featherValue = document.getElementById('featherValue');
+
         let templateImg = null;
         let overlayImg = null;
         let overlayPosition = { x: 0, y: 0 };
         let overlayScale = 1;
         let maskRadius = 95;
+        let featherAmount = 8;
+        let showGuide = true;
+        let maskCenter = { x: canvas.width / 2, y: canvas.height / 2 };
 
-        // Touch/Drag State
-        let isDragging = false;
+        let isDraggingImage = false;
         let dragStartX = 0;
         let dragStartY = 0;
 
-        document.getElementById('templateUpload').addEventListener('change', handleTemplateUpload);
-        document.getElementById('overlayUpload').addEventListener('change', handleOverlayUpload);
-        document.getElementById('downloadBtn').addEventListener('click', downloadImage);
-        document.getElementById('resetBtn').addEventListener('click', resetCanvas);
-        
-        document.getElementById('maskRadiusSlider').addEventListener('input', (e) => {
+        const FINE_STEP = 4;
+        const LARGE_STEP = 12;
+        const MASK_STEP = 3;
+
+        templateUpload.addEventListener('change', handleTemplateUpload);
+        overlayUpload.addEventListener('change', handleOverlayUpload);
+        downloadBtn.addEventListener('click', downloadImage);
+        resetBtn.addEventListener('click', resetCanvas);
+        zoomInBtn.addEventListener('click', () => zoomImage(1.06));
+        zoomOutBtn.addEventListener('click', () => zoomImage(0.94));
+
+        maskRadiusSlider.addEventListener('input', (e) => {
             maskRadius = parseInt(e.target.value, 10);
+            updateReadouts();
             drawCanvas();
         });
 
-        // Movement Control
-        document.getElementById('upBtn').addEventListener('click', () => moveImage(0, -15));
-        document.getElementById('downBtn').addEventListener('click', () => moveImage(0, 15));
-        document.getElementById('leftBtn').addEventListener('click', () => moveImage(-15, 0));
-        document.getElementById('rightBtn').addEventListener('click', () => moveImage(15, 0));
+        featherSlider.addEventListener('input', (e) => {
+            featherAmount = parseInt(e.target.value, 10);
+            updateReadouts();
+            drawCanvas();
+        });
 
-        // Zoom Control
-        document.getElementById('zoomInBtn').addEventListener('click', () => zoomImage(1.1));
-        document.getElementById('zoomOutBtn').addEventListener('click', () => zoomImage(0.9));
+        showGuideToggle.addEventListener('change', (e) => {
+            showGuide = e.target.checked;
+            drawCanvas();
+        });
+
+        centerMaskBtn.addEventListener('click', () => {
+            maskCenter = { x: canvas.width / 2, y: canvas.height / 2 };
+            drawCanvas();
+        });
+
+        centerImageBtn.addEventListener('click', centerOverlayImage);
+
+        document.querySelectorAll('[data-image-move]').forEach((button) => {
+            button.addEventListener('click', (e) => {
+                const size = e.shiftKey ? LARGE_STEP : FINE_STEP;
+                const direction = button.dataset.imageMove;
+                moveByDirection(direction, size, false);
+            });
+        });
+
+        document.querySelectorAll('[data-mask-move]').forEach((button) => {
+            button.addEventListener('click', () => {
+                const direction = button.dataset.maskMove;
+                moveByDirection(direction, MASK_STEP, true);
+            });
+        });
+
+        function updateReadouts() {
+            maskRadiusValue.textContent = `${maskRadius} px`;
+            featherValue.textContent = `${featherAmount} px`;
+        }
 
         function handleTemplateUpload(event) {
             const file = event.target.files[0];
@@ -243,12 +463,18 @@
             overlayImg = new Image();
             overlayImg.onload = () => {
                 const minDimension = Math.min(overlayImg.width, overlayImg.height);
-                overlayScale = (maskRadius * 2) / minDimension;
-                overlayPosition.x = (canvas.width - (overlayImg.width * overlayScale)) / 2;
-                overlayPosition.y = (canvas.height - (overlayImg.height * overlayScale)) / 2;
+                overlayScale = ((maskRadius * 2) / minDimension) * 0.92;
+                centerOverlayImage();
                 drawCanvas();
             };
             overlayImg.src = URL.createObjectURL(file);
+        }
+
+        function centerOverlayImage() {
+            if (!overlayImg) return;
+            overlayPosition.x = maskCenter.x - (overlayImg.width * overlayScale) / 2;
+            overlayPosition.y = maskCenter.y - (overlayImg.height * overlayScale) / 2;
+            drawCanvas();
         }
 
         function drawCanvas() {
@@ -259,41 +485,98 @@
             }
 
             if (overlayImg) {
-                context.save();
-                context.beginPath();
-                context.arc(canvas.width / 2, canvas.height / 2, maskRadius, 0, Math.PI * 2);
-                context.clip();
-                
-                context.drawImage(
-                    overlayImg, 
-                    overlayPosition.x, 
-                    overlayPosition.y, 
-                    overlayImg.width * overlayScale, 
-                    overlayImg.height * overlayScale
-                );
-                context.restore();
+                drawMaskedOverlay();
+            }
+
+            if (showGuide) {
+                drawGuideRing();
             }
         }
 
-        function moveImage(dx, dy) {
-            if (!overlayImg) return;
-            overlayPosition.x += dx;
-            overlayPosition.y += dy;
+        function drawMaskedOverlay() {
+            const diameter = maskRadius * 2;
+            const offscreen = document.createElement('canvas');
+            offscreen.width = canvas.width;
+            offscreen.height = canvas.height;
+            const offCtx = offscreen.getContext('2d');
+
+            offCtx.save();
+            offCtx.beginPath();
+            offCtx.arc(maskCenter.x, maskCenter.y, maskRadius, 0, Math.PI * 2);
+            offCtx.clip();
+            offCtx.drawImage(
+                overlayImg,
+                overlayPosition.x,
+                overlayPosition.y,
+                overlayImg.width * overlayScale,
+                overlayImg.height * overlayScale
+            );
+            offCtx.restore();
+
+            if (featherAmount > 0) {
+                offCtx.globalCompositeOperation = 'destination-in';
+                const gradient = offCtx.createRadialGradient(
+                    maskCenter.x,
+                    maskCenter.y,
+                    Math.max(0, maskRadius - featherAmount),
+                    maskCenter.x,
+                    maskCenter.y,
+                    maskRadius
+                );
+                gradient.addColorStop(0, 'rgba(0,0,0,1)');
+                gradient.addColorStop(1, 'rgba(0,0,0,0)');
+                offCtx.fillStyle = gradient;
+                offCtx.beginPath();
+                offCtx.arc(maskCenter.x, maskCenter.y, maskRadius, 0, Math.PI * 2);
+                offCtx.fill();
+            }
+
+            context.drawImage(offscreen, 0, 0, canvas.width, canvas.height);
+        }
+
+        function drawGuideRing() {
+            context.save();
+            context.beginPath();
+            context.arc(maskCenter.x, maskCenter.y, maskRadius, 0, Math.PI * 2);
+            context.strokeStyle = 'rgba(76, 175, 80, 0.95)';
+            context.lineWidth = 2;
+            context.stroke();
+
+            context.beginPath();
+            context.arc(maskCenter.x, maskCenter.y, Math.max(4, maskRadius - Math.max(2, featherAmount)), 0, Math.PI * 2);
+            context.strokeStyle = 'rgba(76, 175, 80, 0.3)';
+            context.lineWidth = 1;
+            context.setLineDash([6, 6]);
+            context.stroke();
+            context.setLineDash([]);
+            context.restore();
+        }
+
+        function moveByDirection(direction, step, moveMask = false) {
+            const target = moveMask ? maskCenter : overlayPosition;
+            if (!moveMask && !overlayImg) return;
+
+            if (direction === 'up') target.y -= step;
+            if (direction === 'down') target.y += step;
+            if (direction === 'left') target.x -= step;
+            if (direction === 'right') target.x += step;
+
             drawCanvas();
         }
 
         function zoomImage(factor) {
             if (!overlayImg) return;
-            const centerX = canvas.width / 2;
-            const centerY = canvas.height / 2;
-            overlayPosition.x = centerX - (centerX - overlayPosition.x) * factor;
-            overlayPosition.y = centerY - (centerY - overlayPosition.y) * factor;
+            overlayPosition.x = maskCenter.x - (maskCenter.x - overlayPosition.x) * factor;
+            overlayPosition.y = maskCenter.y - (maskCenter.y - overlayPosition.y) * factor;
             overlayScale *= factor;
             drawCanvas();
         }
 
         function downloadImage() {
-            if (!templateImg && !overlayImg) return alert("Nothing to download yet!");
+            if (!templateImg && !overlayImg) {
+                alert('Nothing to download yet!');
+                return;
+            }
             const link = document.createElement('a');
             link.download = 'composed-image.png';
             link.href = canvas.toDataURL('image/png');
@@ -302,23 +585,28 @@
 
         function resetCanvas() {
             context.clearRect(0, 0, canvas.width, canvas.height);
-            document.getElementById('templateUpload').value = '';
-            document.getElementById('overlayUpload').value = '';
+            templateUpload.value = '';
+            overlayUpload.value = '';
             templateImg = null;
             overlayImg = null;
             overlayPosition = { x: 0, y: 0 };
             overlayScale = 1;
             maskRadius = 95;
-            document.getElementById('maskRadiusSlider').value = 95;
+            featherAmount = 8;
+            showGuide = true;
+            maskCenter = { x: canvas.width / 2, y: canvas.height / 2 };
+            isDraggingImage = false;
+            maskRadiusSlider.value = 95;
+            featherSlider.value = 8;
+            showGuideToggle.checked = true;
+            updateReadouts();
         }
 
-        // --- Touch & Drag Logic ---
         function getPointerPos(e) {
             const rect = canvas.getBoundingClientRect();
-            // Scale pointer coordinates if the canvas CSS size differs from its internal width/height
             const scaleX = canvas.width / rect.width;
             const scaleY = canvas.height / rect.height;
-            
+
             let clientX = e.clientX;
             let clientY = e.clientY;
 
@@ -335,53 +623,53 @@
 
         function handleDragStart(e) {
             if (!overlayImg) return;
-            isDragging = true;
+            isDraggingImage = true;
             const pos = getPointerPos(e);
             dragStartX = pos.x;
             dragStartY = pos.y;
-            e.preventDefault(); // Prevent scrolling
+            e.preventDefault();
         }
 
         function handleDragMove(e) {
-            if (!isDragging || !overlayImg) return;
+            if (!isDraggingImage || !overlayImg) return;
             const pos = getPointerPos(e);
             const dx = pos.x - dragStartX;
             const dy = pos.y - dragStartY;
-            
+
             overlayPosition.x += dx;
             overlayPosition.y += dy;
-            
+
             dragStartX = pos.x;
             dragStartY = pos.y;
-            
+
             drawCanvas();
-            e.preventDefault(); // Prevent scrolling
+            e.preventDefault();
         }
 
-        function handleDragEnd(e) {
-            isDragging = false;
+        function handleDragEnd() {
+            isDraggingImage = false;
         }
 
-        // Mouse Events
         canvas.addEventListener('mousedown', handleDragStart);
         window.addEventListener('mousemove', handleDragMove);
         window.addEventListener('mouseup', handleDragEnd);
 
-        // Touch Events
         canvas.addEventListener('touchstart', handleDragStart, { passive: false });
         window.addEventListener('touchmove', handleDragMove, { passive: false });
         window.addEventListener('touchend', handleDragEnd);
 
-        // --- PWA Offline Support ---
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
-                navigator.serviceWorker.register('sw.js').then(registration => {
+                navigator.serviceWorker.register('sw.js').then(() => {
                     console.log('ServiceWorker registration successful');
                 }, err => {
                     console.log('ServiceWorker registration failed: ', err);
                 });
             });
         }
+
+        updateReadouts();
+        drawCanvas();
     </script>
 </body>
 </html>
