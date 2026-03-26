@@ -92,9 +92,7 @@
             border-radius: 10px;
         }
 
-        .upload-box h3 {
-            margin: 0 0 8px;
-        }
+        .upload-box h3 { margin: 0 0 8px; }
 
         .upload-box p,
         .helper,
@@ -151,9 +149,7 @@
             gap: 12px;
         }
 
-        .control-header label {
-            font-weight: bold;
-        }
+        .control-header label { font-weight: bold; }
 
         input[type="range"] {
             width: 100%;
@@ -163,8 +159,7 @@
             border-radius: 4px;
         }
 
-        button,
-        .toggle {
+        button {
             background-color: var(--accent);
             color: white;
             border: none;
@@ -177,23 +172,11 @@
             touch-action: manipulation;
         }
 
-        button:hover,
-        .toggle:hover {
-            background-color: #d81b60;
-        }
+        button:hover { background-color: #d81b60; }
+        button:active { transform: translateY(1px); }
 
-        button:active,
-        .toggle:active {
-            transform: translateY(1px);
-        }
-
-        #resetBtn {
-            background-color: var(--accent-2);
-        }
-
-        #resetBtn:hover {
-            background-color: #fb8c00;
-        }
+        #resetBtn { background-color: var(--accent-2); }
+        #resetBtn:hover { background-color: #fb8c00; }
 
         .button-grid {
             display: grid;
@@ -240,9 +223,7 @@
             gap: 12px;
         }
 
-        .toggle-row input[type="checkbox"] {
-            transform: scale(1.2);
-        }
+        .toggle-row input[type="checkbox"] { transform: scale(1.2); }
 
         .action-buttons {
             display: flex;
@@ -278,7 +259,7 @@
                 </div>
             </div>
 
-            <p class="tip">💡 Drag the photo to reposition it. Hold Shift while nudging for bigger moves.</p>
+            <p class="tip">💡 Drag the photo to reposition it. This version is now frame-aware, not just a generic circle crop.</p>
 
             <div class="panel canvas-wrap">
                 <canvas id="imageCanvas" width="400" height="400"></canvas>
@@ -516,7 +497,6 @@
         }
 
         function drawMaskedOverlay() {
-            const diameter = maskRadius * 2;
             const offscreen = document.createElement('canvas');
             offscreen.width = canvas.width;
             offscreen.height = canvas.height;
@@ -536,21 +516,29 @@
             offCtx.restore();
 
             if (featherAmount > 0) {
-                offCtx.globalCompositeOperation = 'destination-in';
-                const gradient = offCtx.createRadialGradient(
+                const maskCanvas = document.createElement('canvas');
+                maskCanvas.width = canvas.width;
+                maskCanvas.height = canvas.height;
+                const maskCtx = maskCanvas.getContext('2d');
+                const featherStart = Math.max(0, maskRadius - featherAmount);
+                const gradient = maskCtx.createRadialGradient(
                     maskCenter.x,
                     maskCenter.y,
-                    Math.max(0, maskRadius - featherAmount),
+                    featherStart,
                     maskCenter.x,
                     maskCenter.y,
                     maskRadius
                 );
                 gradient.addColorStop(0, 'rgba(0,0,0,1)');
                 gradient.addColorStop(1, 'rgba(0,0,0,0)');
-                offCtx.fillStyle = gradient;
-                offCtx.beginPath();
-                offCtx.arc(maskCenter.x, maskCenter.y, maskRadius, 0, Math.PI * 2);
-                offCtx.fill();
+                maskCtx.fillStyle = gradient;
+                maskCtx.beginPath();
+                maskCtx.arc(maskCenter.x, maskCenter.y, maskRadius, 0, Math.PI * 2);
+                maskCtx.fill();
+
+                offCtx.globalCompositeOperation = 'destination-in';
+                offCtx.drawImage(maskCanvas, 0, 0);
+                offCtx.globalCompositeOperation = 'source-over';
             }
 
             context.drawImage(offscreen, 0, 0, canvas.width, canvas.height);
@@ -609,6 +597,7 @@
                 alert('Nothing to download yet!');
                 return;
             }
+            drawCanvas();
             const link = document.createElement('a');
             link.download = 'composed-image.png';
             link.href = canvas.toDataURL('image/png');
@@ -634,6 +623,7 @@
             frameInsetSlider.value = 18;
             showGuideToggle.checked = true;
             updateReadouts();
+            drawCanvas();
         }
 
         function getPointerPos(e) {
@@ -687,18 +677,13 @@
         canvas.addEventListener('mousedown', handleDragStart);
         window.addEventListener('mousemove', handleDragMove);
         window.addEventListener('mouseup', handleDragEnd);
-
         canvas.addEventListener('touchstart', handleDragStart, { passive: false });
         window.addEventListener('touchmove', handleDragMove, { passive: false });
         window.addEventListener('touchend', handleDragEnd);
 
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
-                navigator.serviceWorker.register('sw.js').then(() => {
-                    console.log('ServiceWorker registration successful');
-                }, err => {
-                    console.log('ServiceWorker registration failed: ', err);
-                });
+                navigator.serviceWorker.register('sw.js').catch(() => {});
             });
         }
 
