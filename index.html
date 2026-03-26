@@ -307,6 +307,15 @@
                 </div>
 
                 <div class="control-group">
+                    <div class="control-header">
+                        <label for="frameInsetSlider">Frame Cover</label>
+                        <span class="value-label" id="frameInsetValue">18 px</span>
+                    </div>
+                    <input type="range" id="frameInsetSlider" min="0" max="40" value="18">
+                    <div class="helper">Lets the inner ring sit over the portrait and hide overlap from the frame design.</div>
+                </div>
+
+                <div class="control-group">
                     <div class="toggle-row">
                         <label for="showGuideToggle">Show Guide Ring</label>
                         <input type="checkbox" id="showGuideToggle" checked>
@@ -373,11 +382,13 @@
         const zoomOutBtn = document.getElementById('zoomOutBtn');
         const maskRadiusSlider = document.getElementById('maskRadiusSlider');
         const featherSlider = document.getElementById('featherSlider');
+        const frameInsetSlider = document.getElementById('frameInsetSlider');
         const showGuideToggle = document.getElementById('showGuideToggle');
         const centerMaskBtn = document.getElementById('centerMaskBtn');
         const centerImageBtn = document.getElementById('centerImageBtn');
         const maskRadiusValue = document.getElementById('maskRadiusValue');
         const featherValue = document.getElementById('featherValue');
+        const frameInsetValue = document.getElementById('frameInsetValue');
 
         let templateImg = null;
         let overlayImg = null;
@@ -385,6 +396,7 @@
         let overlayScale = 1;
         let maskRadius = 95;
         let featherAmount = 8;
+        let frameOverlayInset = 18;
         let showGuide = true;
         let maskCenter = { x: canvas.width / 2, y: canvas.height / 2 };
 
@@ -411,6 +423,12 @@
 
         featherSlider.addEventListener('input', (e) => {
             featherAmount = parseInt(e.target.value, 10);
+            updateReadouts();
+            drawCanvas();
+        });
+
+        frameInsetSlider.addEventListener('input', (e) => {
+            frameOverlayInset = parseInt(e.target.value, 10);
             updateReadouts();
             drawCanvas();
         });
@@ -445,6 +463,7 @@
         function updateReadouts() {
             maskRadiusValue.textContent = `${maskRadius} px`;
             featherValue.textContent = `${featherAmount} px`;
+            frameInsetValue.textContent = `${frameOverlayInset} px`;
         }
 
         function handleTemplateUpload(event) {
@@ -486,6 +505,9 @@
 
             if (overlayImg) {
                 drawMaskedOverlay();
+                if (templateImg && frameOverlayInset > 0) {
+                    redrawFrameAbovePortrait();
+                }
             }
 
             if (showGuide) {
@@ -532,6 +554,16 @@
             }
 
             context.drawImage(offscreen, 0, 0, canvas.width, canvas.height);
+        }
+
+        function redrawFrameAbovePortrait() {
+            const innerRadius = Math.max(1, maskRadius - frameOverlayInset);
+            context.save();
+            context.beginPath();
+            context.arc(maskCenter.x, maskCenter.y, innerRadius, 0, Math.PI * 2);
+            context.clip();
+            context.drawImage(templateImg, 0, 0, canvas.width, canvas.height);
+            context.restore();
         }
 
         function drawGuideRing() {
@@ -593,11 +625,13 @@
             overlayScale = 1;
             maskRadius = 95;
             featherAmount = 8;
+            frameOverlayInset = 18;
             showGuide = true;
             maskCenter = { x: canvas.width / 2, y: canvas.height / 2 };
             isDraggingImage = false;
             maskRadiusSlider.value = 95;
             featherSlider.value = 8;
+            frameInsetSlider.value = 18;
             showGuideToggle.checked = true;
             updateReadouts();
         }
