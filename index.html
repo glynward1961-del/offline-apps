@@ -1,14 +1,12 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
     <title>Image Compositor</title>
-
-    <link rel="manifest" href="manifest.json">
-    <meta name="theme-color" content="#121212">
-    <link rel="apple-touch-icon" href="logo.png">
-
+    <link rel="manifest" href="manifest.json" />
+    <meta name="theme-color" content="#121212" />
+    <link rel="apple-touch-icon" href="logo.png" />
     <style>
         :root {
             --bg: #121212;
@@ -26,7 +24,7 @@
         * { box-sizing: border-box; }
 
         body {
-            background-color: var(--bg);
+            background: var(--bg);
             color: var(--text);
             display: flex;
             flex-direction: column;
@@ -118,7 +116,7 @@
 
         canvas {
             border: 1px solid rgba(255,255,255,0.15);
-            background-color: #333;
+            background: #333;
             max-width: 100%;
             height: auto;
             touch-action: none;
@@ -247,19 +245,19 @@
             <div class="panel">
                 <div class="upload-grid">
                     <div class="upload-box">
-                        <h3>1. Background</h3>
-                        <p>Upload the template or frame</p>
-                        <input type="file" id="templateUpload" accept="image/*" style="width: 100%;">
+                        <h3>1. Badge / Frame</h3>
+                        <p>Top layer with transparent centre opening</p>
+                        <input type="file" id="templateUpload" accept="image/*" style="width: 100%;" />
                     </div>
                     <div class="upload-box">
-                        <h3>2. Face / Fill</h3>
-                        <p>Upload the image for the circle</p>
-                        <input type="file" id="overlayUpload" accept="image/*" style="width: 100%;">
+                        <h3>2. Face Image</h3>
+                        <p>Master bottom layer</p>
+                        <input type="file" id="overlayUpload" accept="image/*" style="width: 100%;" />
                     </div>
                 </div>
             </div>
 
-            <p class="tip">💡 Drag the photo to reposition it. This version is now frame-aware, not just a generic circle crop.</p>
+            <p class="tip">💡 Correct model: face image underneath, badge/frame on top, no photo visible beyond the badge edge.</p>
 
             <div class="panel canvas-wrap">
                 <canvas id="imageCanvas" width="400" height="400"></canvas>
@@ -268,63 +266,44 @@
 
         <div class="right-column">
             <div class="panel">
-                <h2 class="section-title">Mask & Guide</h2>
+                <h2 class="section-title">Opening & Guide</h2>
 
                 <div class="control-group">
                     <div class="control-header">
-                        <label for="maskRadiusSlider">Circle Size</label>
+                        <label for="maskRadiusSlider">Opening Size</label>
                         <span class="value-label" id="maskRadiusValue">95 px</span>
                     </div>
-                    <input type="range" id="maskRadiusSlider" min="40" max="220" value="95">
+                    <input type="range" id="maskRadiusSlider" min="40" max="220" value="95" />
                 </div>
 
                 <div class="control-group">
                     <div class="control-header">
-                        <label for="featherSlider">Mask Feather</label>
-                        <span class="value-label" id="featherValue">8 px</span>
+                        <label for="featherSlider">Edge Softness</label>
+                        <span class="value-label" id="featherValue">0 px</span>
                     </div>
-                    <input type="range" id="featherSlider" min="0" max="40" value="8">
-                    <div class="helper">Softens the edge so portraits blend into ornate frames better.</div>
-                </div>
-
-                <div class="control-group">
-                    <div class="control-header">
-                        <label for="frameInsetSlider">Frame Cover</label>
-                        <span class="value-label" id="frameInsetValue">18 px</span>
-                    </div>
-                    <input type="range" id="frameInsetSlider" min="0" max="40" value="18">
-                    <div class="helper">Lets the inner ring sit over the portrait and hide overlap from the frame design.</div>
-                </div>
-
-                <div class="control-group">
-                    <div class="control-header">
-                        <label for="safeInsetSlider">Inner Safe Area</label>
-                        <span class="value-label" id="safeInsetValue">20 px</span>
-                    </div>
-                    <input type="range" id="safeInsetSlider" min="0" max="60" value="20">
-                    <div class="helper">Shrinks the usable portrait area so decorative overlaps stay in front instead of being swallowed.</div>
+                    <input type="range" id="featherSlider" min="0" max="20" value="0" />
+                    <div class="helper">Keep this low unless the badge edge really needs a softer blend.</div>
                 </div>
 
                 <div class="control-group">
                     <div class="toggle-row">
                         <label for="showGuideToggle">Show Guide Ring</label>
-                        <input type="checkbox" id="showGuideToggle" checked>
+                        <input type="checkbox" id="showGuideToggle" checked />
                     </div>
-                    <div class="helper">Green guide helps match the opening in the frame.</div>
+                    <div class="helper">Green ring helps line up the visible opening.</div>
                 </div>
 
                 <div class="control-group">
                     <div class="small-actions">
-                        <button id="centerMaskBtn">Center Mask</button>
-                        <button id="centerImageBtn">Center Photo</button>
+                        <button id="centerMaskBtn">Center Opening</button>
                         <button id="balancePhotoBtn">Balance Photo</button>
                     </div>
                 </div>
             </div>
 
             <div class="panel">
-                <h2 class="section-title">Move the Mask</h2>
-                <div class="helper">Use this when the frame opening isn’t perfectly centred.</div>
+                <h2 class="section-title">Move the Opening</h2>
+                <div class="helper">Use this if the badge opening isn’t perfectly centred in the uploaded art.</div>
                 <div class="movement-pad">
                     <button data-mask-move="up">⬆</button>
                     <div class="movement-row">
@@ -336,7 +315,7 @@
             </div>
 
             <div class="panel">
-                <h2 class="section-title">Move & Scale the Photo</h2>
+                <h2 class="section-title">Move & Scale the Face</h2>
                 <div class="button-grid">
                     <button id="zoomInBtn">🔍 Zoom In</button>
                     <button id="zoomOutBtn">➖ Zoom Out</button>
@@ -349,7 +328,7 @@
                         <button data-image-move="right">➡</button>
                     </div>
                 </div>
-                <p class="status-line">Nudge buttons use fine steps for cleaner alignment.</p>
+                <p class="status-line">Fine nudges for the face image. Dragging on the canvas also moves it.</p>
             </div>
 
             <div class="panel">
@@ -373,63 +352,44 @@
         const zoomOutBtn = document.getElementById('zoomOutBtn');
         const maskRadiusSlider = document.getElementById('maskRadiusSlider');
         const featherSlider = document.getElementById('featherSlider');
-        const frameInsetSlider = document.getElementById('frameInsetSlider');
-        const safeInsetSlider = document.getElementById('safeInsetSlider');
         const showGuideToggle = document.getElementById('showGuideToggle');
         const centerMaskBtn = document.getElementById('centerMaskBtn');
-        const centerImageBtn = document.getElementById('centerImageBtn');
         const balancePhotoBtn = document.getElementById('balancePhotoBtn');
         const maskRadiusValue = document.getElementById('maskRadiusValue');
         const featherValue = document.getElementById('featherValue');
-        const frameInsetValue = document.getElementById('frameInsetValue');
-        const safeInsetValue = document.getElementById('safeInsetValue');
 
-        let templateImg = null;
-        let overlayImg = null;
-        let overlayPosition = { x: 0, y: 0 };
-        let overlayScale = 1;
-        let maskRadius = 95;
-        let featherAmount = 8;
-        let frameOverlayInset = 18;
-        let safeInset = 20;
+        let badgeImg = null;
+        let faceImg = null;
+        let facePosition = { x: 0, y: 0 };
+        let faceScale = 1;
+        let openingRadius = 95;
+        let edgeSoftness = 0;
         let showGuide = true;
-        let maskCenter = { x: canvas.width / 2, y: canvas.height / 2 };
+        let openingCenter = { x: canvas.width / 2, y: canvas.height / 2 };
 
-        let isDraggingImage = false;
+        let isDraggingFace = false;
         let dragStartX = 0;
         let dragStartY = 0;
 
         const FINE_STEP = 4;
         const LARGE_STEP = 12;
-        const MASK_STEP = 3;
+        const OPENING_STEP = 3;
 
-        templateUpload.addEventListener('change', handleTemplateUpload);
-        overlayUpload.addEventListener('change', handleOverlayUpload);
+        templateUpload.addEventListener('change', handleBadgeUpload);
+        overlayUpload.addEventListener('change', handleFaceUpload);
         downloadBtn.addEventListener('click', downloadImage);
         resetBtn.addEventListener('click', resetCanvas);
-        zoomInBtn.addEventListener('click', () => zoomImage(1.06));
-        zoomOutBtn.addEventListener('click', () => zoomImage(0.94));
+        zoomInBtn.addEventListener('click', () => zoomFace(1.06));
+        zoomOutBtn.addEventListener('click', () => zoomFace(0.94));
 
         maskRadiusSlider.addEventListener('input', (e) => {
-            maskRadius = parseInt(e.target.value, 10);
+            openingRadius = parseInt(e.target.value, 10);
             updateReadouts();
             drawCanvas();
         });
 
         featherSlider.addEventListener('input', (e) => {
-            featherAmount = parseInt(e.target.value, 10);
-            updateReadouts();
-            drawCanvas();
-        });
-
-        frameInsetSlider.addEventListener('input', (e) => {
-            frameOverlayInset = parseInt(e.target.value, 10);
-            updateReadouts();
-            drawCanvas();
-        });
-
-        safeInsetSlider.addEventListener('input', (e) => {
-            safeInset = parseInt(e.target.value, 10);
+            edgeSoftness = parseInt(e.target.value, 10);
             updateReadouts();
             drawCanvas();
         });
@@ -440,12 +400,11 @@
         });
 
         centerMaskBtn.addEventListener('click', () => {
-            maskCenter = { x: canvas.width / 2, y: canvas.height / 2 };
+            openingCenter = { x: canvas.width / 2, y: canvas.height / 2 };
             drawCanvas();
         });
 
-        centerImageBtn.addEventListener('click', centerOverlayImage);
-        balancePhotoBtn.addEventListener('click', balanceOverlayToOpening);
+        balancePhotoBtn.addEventListener('click', balanceFaceToOpening);
 
         document.querySelectorAll('[data-image-move]').forEach((button) => {
             button.addEventListener('click', (e) => {
@@ -458,71 +417,55 @@
         document.querySelectorAll('[data-mask-move]').forEach((button) => {
             button.addEventListener('click', () => {
                 const direction = button.dataset.maskMove;
-                moveByDirection(direction, MASK_STEP, true);
+                moveByDirection(direction, OPENING_STEP, true);
             });
         });
 
         function updateReadouts() {
-            maskRadiusValue.textContent = `${maskRadius} px`;
-            featherValue.textContent = `${featherAmount} px`;
-            frameInsetValue.textContent = `${frameOverlayInset} px`;
-            safeInsetValue.textContent = `${safeInset} px`;
+            maskRadiusValue.textContent = `${openingRadius} px`;
+            featherValue.textContent = `${edgeSoftness} px`;
         }
 
-        function handleTemplateUpload(event) {
+        function handleBadgeUpload(event) {
             const file = event.target.files[0];
             if (!file) return;
-            templateImg = new Image();
-            templateImg.onload = () => {
+            badgeImg = new Image();
+            badgeImg.onload = () => {
                 drawCanvas();
             };
-            templateImg.src = URL.createObjectURL(file);
+            badgeImg.src = URL.createObjectURL(file);
         }
 
-        function handleOverlayUpload(event) {
+        function handleFaceUpload(event) {
             const file = event.target.files[0];
             if (!file) return;
-            overlayImg = new Image();
-            overlayImg.onload = () => {
-                const minDimension = Math.min(overlayImg.width, overlayImg.height);
-                const usableRadius = Math.max(10, maskRadius - safeInset);
-                overlayScale = ((usableRadius * 2) / minDimension) * 0.92;
-                balanceOverlayToOpening();
+            faceImg = new Image();
+            faceImg.onload = () => {
+                const minDimension = Math.min(faceImg.width, faceImg.height);
+                faceScale = ((openingRadius * 2) / minDimension) * 1.02;
+                balanceFaceToOpening();
             };
-            overlayImg.src = URL.createObjectURL(file);
+            faceImg.src = URL.createObjectURL(file);
         }
 
-        function centerOverlayImage() {
-            if (!overlayImg) return;
-            overlayPosition.x = maskCenter.x - (overlayImg.width * overlayScale) / 2;
-            overlayPosition.y = maskCenter.y - (overlayImg.height * overlayScale) / 2;
-            drawCanvas();
-        }
-
-        function balanceOverlayToOpening() {
-            if (!overlayImg) return;
-            const usableRadius = Math.max(10, maskRadius - safeInset);
-            const drawWidth = overlayImg.width * overlayScale;
-            const drawHeight = overlayImg.height * overlayScale;
-
-            overlayPosition.x = maskCenter.x - (drawWidth / 2);
-            overlayPosition.y = maskCenter.y - (drawHeight / 2) - Math.round(usableRadius * 0.08);
-
+        function balanceFaceToOpening() {
+            if (!faceImg) return;
+            const drawWidth = faceImg.width * faceScale;
+            const drawHeight = faceImg.height * faceScale;
+            facePosition.x = openingCenter.x - (drawWidth / 2);
+            facePosition.y = openingCenter.y - (drawHeight / 2) - Math.round(openingRadius * 0.06);
             drawCanvas();
         }
 
         function drawCanvas() {
             context.clearRect(0, 0, canvas.width, canvas.height);
 
-            if (templateImg) {
-                context.drawImage(templateImg, 0, 0, canvas.width, canvas.height);
+            if (faceImg) {
+                drawFaceLayer();
             }
 
-            if (overlayImg) {
-                drawMaskedOverlay();
-                if (templateImg && frameOverlayInset > 0) {
-                    redrawFrameAbovePortrait();
-                }
+            if (badgeImg) {
+                context.drawImage(badgeImg, 0, 0, canvas.width, canvas.height);
             }
 
             if (showGuide) {
@@ -530,77 +473,87 @@
             }
         }
 
-        function drawMaskedOverlay() {
-            const usableRadius = Math.max(10, maskRadius - safeInset);
-            const featherRadius = Math.max(0, usableRadius - featherAmount);
+        function drawFaceLayer() {
+            const radius = Math.max(10, openingRadius);
 
-            context.save();
-            context.beginPath();
-            context.arc(maskCenter.x, maskCenter.y, usableRadius, 0, Math.PI * 2);
-            context.clip();
-            context.drawImage(
-                overlayImg,
-                overlayPosition.x,
-                overlayPosition.y,
-                overlayImg.width * overlayScale,
-                overlayImg.height * overlayScale
-            );
-            context.restore();
-
-            if (featherAmount > 0) {
+            if (edgeSoftness <= 0) {
                 context.save();
-                context.globalCompositeOperation = 'destination-in';
-                const gradient = context.createRadialGradient(
-                    maskCenter.x,
-                    maskCenter.y,
-                    featherRadius,
-                    maskCenter.x,
-                    maskCenter.y,
-                    usableRadius
-                );
-                gradient.addColorStop(0, 'rgba(0,0,0,1)');
-                gradient.addColorStop(1, 'rgba(0,0,0,0)');
-                context.fillStyle = gradient;
                 context.beginPath();
-                context.arc(maskCenter.x, maskCenter.y, usableRadius, 0, Math.PI * 2);
-                context.fill();
+                context.arc(openingCenter.x, openingCenter.y, radius, 0, Math.PI * 2);
+                context.clip();
+                context.drawImage(
+                    faceImg,
+                    facePosition.x,
+                    facePosition.y,
+                    faceImg.width * faceScale,
+                    faceImg.height * faceScale
+                );
                 context.restore();
+                return;
             }
-        }
 
-        function redrawFrameAbovePortrait() {
-            const innerRadius = Math.max(1, maskRadius - frameOverlayInset);
-            context.save();
-            context.beginPath();
-            context.arc(maskCenter.x, maskCenter.y, innerRadius, 0, Math.PI * 2);
-            context.clip();
-            context.drawImage(templateImg, 0, 0, canvas.width, canvas.height);
-            context.restore();
+            const offscreen = document.createElement('canvas');
+            offscreen.width = canvas.width;
+            offscreen.height = canvas.height;
+            const offCtx = offscreen.getContext('2d');
+
+            offCtx.save();
+            offCtx.beginPath();
+            offCtx.arc(openingCenter.x, openingCenter.y, radius, 0, Math.PI * 2);
+            offCtx.clip();
+            offCtx.drawImage(
+                faceImg,
+                facePosition.x,
+                facePosition.y,
+                faceImg.width * faceScale,
+                faceImg.height * faceScale
+            );
+            offCtx.restore();
+
+            offCtx.globalCompositeOperation = 'destination-in';
+            const featherStart = Math.max(0, radius - edgeSoftness);
+            const gradient = offCtx.createRadialGradient(
+                openingCenter.x,
+                openingCenter.y,
+                featherStart,
+                openingCenter.x,
+                openingCenter.y,
+                radius
+            );
+            gradient.addColorStop(0, 'rgba(0,0,0,1)');
+            gradient.addColorStop(1, 'rgba(0,0,0,0)');
+            offCtx.fillStyle = gradient;
+            offCtx.beginPath();
+            offCtx.arc(openingCenter.x, openingCenter.y, radius, 0, Math.PI * 2);
+            offCtx.fill();
+            offCtx.globalCompositeOperation = 'source-over';
+
+            context.drawImage(offscreen, 0, 0, canvas.width, canvas.height);
         }
 
         function drawGuideRing() {
             context.save();
-            const usableRadius = Math.max(10, maskRadius - safeInset);
-
             context.beginPath();
-            context.arc(maskCenter.x, maskCenter.y, maskRadius, 0, Math.PI * 2);
+            context.arc(openingCenter.x, openingCenter.y, openingRadius, 0, Math.PI * 2);
             context.strokeStyle = 'rgba(76, 175, 80, 0.95)';
             context.lineWidth = 2;
             context.stroke();
 
-            context.beginPath();
-            context.arc(maskCenter.x, maskCenter.y, usableRadius, 0, Math.PI * 2);
-            context.strokeStyle = 'rgba(76, 175, 80, 0.3)';
-            context.lineWidth = 1;
-            context.setLineDash([6, 6]);
-            context.stroke();
-            context.setLineDash([]);
+            if (edgeSoftness > 0) {
+                context.beginPath();
+                context.arc(openingCenter.x, openingCenter.y, Math.max(4, openingRadius - edgeSoftness), 0, Math.PI * 2);
+                context.strokeStyle = 'rgba(76, 175, 80, 0.35)';
+                context.lineWidth = 1;
+                context.setLineDash([6, 6]);
+                context.stroke();
+                context.setLineDash([]);
+            }
             context.restore();
         }
 
-        function moveByDirection(direction, step, moveMask = false) {
-            const target = moveMask ? maskCenter : overlayPosition;
-            if (!moveMask && !overlayImg) return;
+        function moveByDirection(direction, step, moveOpening = false) {
+            const target = moveOpening ? openingCenter : facePosition;
+            if (!moveOpening && !faceImg) return;
 
             if (direction === 'up') target.y -= step;
             if (direction === 'down') target.y += step;
@@ -610,16 +563,16 @@
             drawCanvas();
         }
 
-        function zoomImage(factor) {
-            if (!overlayImg) return;
-            overlayPosition.x = maskCenter.x - (maskCenter.x - overlayPosition.x) * factor;
-            overlayPosition.y = maskCenter.y - (maskCenter.y - overlayPosition.y) * factor;
-            overlayScale *= factor;
+        function zoomFace(factor) {
+            if (!faceImg) return;
+            facePosition.x = openingCenter.x - (openingCenter.x - facePosition.x) * factor;
+            facePosition.y = openingCenter.y - (openingCenter.y - facePosition.y) * factor;
+            faceScale *= factor;
             drawCanvas();
         }
 
         function downloadImage() {
-            if (!templateImg && !overlayImg) {
+            if (!badgeImg && !faceImg) {
                 alert('Nothing to download yet!');
                 return;
             }
@@ -634,21 +587,17 @@
             context.clearRect(0, 0, canvas.width, canvas.height);
             templateUpload.value = '';
             overlayUpload.value = '';
-            templateImg = null;
-            overlayImg = null;
-            overlayPosition = { x: 0, y: 0 };
-            overlayScale = 1;
-            maskRadius = 95;
-            featherAmount = 8;
-            frameOverlayInset = 18;
-            safeInset = 20;
+            badgeImg = null;
+            faceImg = null;
+            facePosition = { x: 0, y: 0 };
+            faceScale = 1;
+            openingRadius = 95;
+            edgeSoftness = 0;
             showGuide = true;
-            maskCenter = { x: canvas.width / 2, y: canvas.height / 2 };
-            isDraggingImage = false;
+            openingCenter = { x: canvas.width / 2, y: canvas.height / 2 };
+            isDraggingFace = false;
             maskRadiusSlider.value = 95;
-            featherSlider.value = 8;
-            frameInsetSlider.value = 18;
-            safeInsetSlider.value = 20;
+            featherSlider.value = 0;
             showGuideToggle.checked = true;
             updateReadouts();
             drawCanvas();
@@ -674,8 +623,8 @@
         }
 
         function handleDragStart(e) {
-            if (!overlayImg) return;
-            isDraggingImage = true;
+            if (!faceImg) return;
+            isDraggingFace = true;
             const pos = getPointerPos(e);
             dragStartX = pos.x;
             dragStartY = pos.y;
@@ -683,14 +632,13 @@
         }
 
         function handleDragMove(e) {
-            if (!isDraggingImage || !overlayImg) return;
+            if (!isDraggingFace || !faceImg) return;
             const pos = getPointerPos(e);
             const dx = pos.x - dragStartX;
             const dy = pos.y - dragStartY;
 
-            overlayPosition.x += dx;
-            overlayPosition.y += dy;
-
+            facePosition.x += dx;
+            facePosition.y += dy;
             dragStartX = pos.x;
             dragStartY = pos.y;
 
@@ -699,7 +647,7 @@
         }
 
         function handleDragEnd() {
-            isDraggingImage = false;
+            isDraggingFace = false;
         }
 
         canvas.addEventListener('mousedown', handleDragStart);
