@@ -297,6 +297,15 @@
                 </div>
 
                 <div class="control-group">
+                    <div class="control-header">
+                        <label for="safeInsetSlider">Inner Safe Area</label>
+                        <span class="value-label" id="safeInsetValue">20 px</span>
+                    </div>
+                    <input type="range" id="safeInsetSlider" min="0" max="60" value="20">
+                    <div class="helper">Shrinks the usable portrait area so decorative overlaps stay in front instead of being swallowed.</div>
+                </div>
+
+                <div class="control-group">
                     <div class="toggle-row">
                         <label for="showGuideToggle">Show Guide Ring</label>
                         <input type="checkbox" id="showGuideToggle" checked>
@@ -364,12 +373,14 @@
         const maskRadiusSlider = document.getElementById('maskRadiusSlider');
         const featherSlider = document.getElementById('featherSlider');
         const frameInsetSlider = document.getElementById('frameInsetSlider');
+        const safeInsetSlider = document.getElementById('safeInsetSlider');
         const showGuideToggle = document.getElementById('showGuideToggle');
         const centerMaskBtn = document.getElementById('centerMaskBtn');
         const centerImageBtn = document.getElementById('centerImageBtn');
         const maskRadiusValue = document.getElementById('maskRadiusValue');
         const featherValue = document.getElementById('featherValue');
         const frameInsetValue = document.getElementById('frameInsetValue');
+        const safeInsetValue = document.getElementById('safeInsetValue');
 
         let templateImg = null;
         let overlayImg = null;
@@ -378,6 +389,7 @@
         let maskRadius = 95;
         let featherAmount = 8;
         let frameOverlayInset = 18;
+        let safeInset = 20;
         let showGuide = true;
         let maskCenter = { x: canvas.width / 2, y: canvas.height / 2 };
 
@@ -414,6 +426,12 @@
             drawCanvas();
         });
 
+        safeInsetSlider.addEventListener('input', (e) => {
+            safeInset = parseInt(e.target.value, 10);
+            updateReadouts();
+            drawCanvas();
+        });
+
         showGuideToggle.addEventListener('change', (e) => {
             showGuide = e.target.checked;
             drawCanvas();
@@ -445,6 +463,7 @@
             maskRadiusValue.textContent = `${maskRadius} px`;
             featherValue.textContent = `${featherAmount} px`;
             frameInsetValue.textContent = `${frameOverlayInset} px`;
+            safeInsetValue.textContent = `${safeInset} px`;
         }
 
         function handleTemplateUpload(event) {
@@ -463,7 +482,8 @@
             overlayImg = new Image();
             overlayImg.onload = () => {
                 const minDimension = Math.min(overlayImg.width, overlayImg.height);
-                overlayScale = ((maskRadius * 2) / minDimension) * 0.92;
+                const usableRadius = Math.max(10, maskRadius - safeInset);
+                overlayScale = ((usableRadius * 2) / minDimension) * 0.92;
                 centerOverlayImage();
                 drawCanvas();
             };
@@ -502,9 +522,11 @@
             offscreen.height = canvas.height;
             const offCtx = offscreen.getContext('2d');
 
+            const usableRadius = Math.max(10, maskRadius - safeInset);
+
             offCtx.save();
             offCtx.beginPath();
-            offCtx.arc(maskCenter.x, maskCenter.y, maskRadius, 0, Math.PI * 2);
+            offCtx.arc(maskCenter.x, maskCenter.y, usableRadius, 0, Math.PI * 2);
             offCtx.clip();
             offCtx.drawImage(
                 overlayImg,
@@ -520,20 +542,21 @@
                 maskCanvas.width = canvas.width;
                 maskCanvas.height = canvas.height;
                 const maskCtx = maskCanvas.getContext('2d');
-                const featherStart = Math.max(0, maskRadius - featherAmount);
+                const featherRadius = Math.max(10, maskRadius - safeInset);
+                const featherStart = Math.max(0, featherRadius - featherAmount);
                 const gradient = maskCtx.createRadialGradient(
                     maskCenter.x,
                     maskCenter.y,
                     featherStart,
                     maskCenter.x,
                     maskCenter.y,
-                    maskRadius
+                    featherRadius
                 );
                 gradient.addColorStop(0, 'rgba(0,0,0,1)');
                 gradient.addColorStop(1, 'rgba(0,0,0,0)');
                 maskCtx.fillStyle = gradient;
                 maskCtx.beginPath();
-                maskCtx.arc(maskCenter.x, maskCenter.y, maskRadius, 0, Math.PI * 2);
+                maskCtx.arc(maskCenter.x, maskCenter.y, featherRadius, 0, Math.PI * 2);
                 maskCtx.fill();
 
                 offCtx.globalCompositeOperation = 'destination-in';
@@ -556,6 +579,8 @@
 
         function drawGuideRing() {
             context.save();
+            const usableRadius = Math.max(10, maskRadius - safeInset);
+
             context.beginPath();
             context.arc(maskCenter.x, maskCenter.y, maskRadius, 0, Math.PI * 2);
             context.strokeStyle = 'rgba(76, 175, 80, 0.95)';
@@ -563,7 +588,7 @@
             context.stroke();
 
             context.beginPath();
-            context.arc(maskCenter.x, maskCenter.y, Math.max(4, maskRadius - Math.max(2, featherAmount)), 0, Math.PI * 2);
+            context.arc(maskCenter.x, maskCenter.y, usableRadius, 0, Math.PI * 2);
             context.strokeStyle = 'rgba(76, 175, 80, 0.3)';
             context.lineWidth = 1;
             context.setLineDash([6, 6]);
@@ -615,12 +640,14 @@
             maskRadius = 95;
             featherAmount = 8;
             frameOverlayInset = 18;
+            safeInset = 20;
             showGuide = true;
             maskCenter = { x: canvas.width / 2, y: canvas.height / 2 };
             isDraggingImage = false;
             maskRadiusSlider.value = 95;
             featherSlider.value = 8;
             frameInsetSlider.value = 18;
+            safeInsetSlider.value = 20;
             showGuideToggle.checked = true;
             updateReadouts();
             drawCanvas();
