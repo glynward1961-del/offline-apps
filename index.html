@@ -317,6 +317,7 @@
                     <div class="small-actions">
                         <button id="centerMaskBtn">Center Mask</button>
                         <button id="centerImageBtn">Center Photo</button>
+                        <button id="balancePhotoBtn">Balance Photo</button>
                     </div>
                 </div>
             </div>
@@ -377,6 +378,7 @@
         const showGuideToggle = document.getElementById('showGuideToggle');
         const centerMaskBtn = document.getElementById('centerMaskBtn');
         const centerImageBtn = document.getElementById('centerImageBtn');
+        const balancePhotoBtn = document.getElementById('balancePhotoBtn');
         const maskRadiusValue = document.getElementById('maskRadiusValue');
         const featherValue = document.getElementById('featherValue');
         const frameInsetValue = document.getElementById('frameInsetValue');
@@ -443,6 +445,7 @@
         });
 
         centerImageBtn.addEventListener('click', centerOverlayImage);
+        balancePhotoBtn.addEventListener('click', balanceOverlayToOpening);
 
         document.querySelectorAll('[data-image-move]').forEach((button) => {
             button.addEventListener('click', (e) => {
@@ -484,8 +487,7 @@
                 const minDimension = Math.min(overlayImg.width, overlayImg.height);
                 const usableRadius = Math.max(10, maskRadius - safeInset);
                 overlayScale = ((usableRadius * 2) / minDimension) * 0.92;
-                centerOverlayImage();
-                drawCanvas();
+                balanceOverlayToOpening();
             };
             overlayImg.src = URL.createObjectURL(file);
         }
@@ -494,6 +496,18 @@
             if (!overlayImg) return;
             overlayPosition.x = maskCenter.x - (overlayImg.width * overlayScale) / 2;
             overlayPosition.y = maskCenter.y - (overlayImg.height * overlayScale) / 2;
+            drawCanvas();
+        }
+
+        function balanceOverlayToOpening() {
+            if (!overlayImg) return;
+            const usableRadius = Math.max(10, maskRadius - safeInset);
+            const drawWidth = overlayImg.width * overlayScale;
+            const drawHeight = overlayImg.height * overlayScale;
+
+            overlayPosition.x = maskCenter.x - (drawWidth / 2);
+            overlayPosition.y = maskCenter.y - (drawHeight / 2) - Math.round(usableRadius * 0.08);
+
             drawCanvas();
         }
 
