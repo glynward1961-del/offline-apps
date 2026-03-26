@@ -531,54 +531,41 @@
         }
 
         function drawMaskedOverlay() {
-            const offscreen = document.createElement('canvas');
-            offscreen.width = canvas.width;
-            offscreen.height = canvas.height;
-            const offCtx = offscreen.getContext('2d');
-
             const usableRadius = Math.max(10, maskRadius - safeInset);
+            const featherRadius = Math.max(0, usableRadius - featherAmount);
 
-            offCtx.save();
-            offCtx.beginPath();
-            offCtx.arc(maskCenter.x, maskCenter.y, usableRadius, 0, Math.PI * 2);
-            offCtx.clip();
-            offCtx.drawImage(
+            context.save();
+            context.beginPath();
+            context.arc(maskCenter.x, maskCenter.y, usableRadius, 0, Math.PI * 2);
+            context.clip();
+            context.drawImage(
                 overlayImg,
                 overlayPosition.x,
                 overlayPosition.y,
                 overlayImg.width * overlayScale,
                 overlayImg.height * overlayScale
             );
-            offCtx.restore();
+            context.restore();
 
             if (featherAmount > 0) {
-                const maskCanvas = document.createElement('canvas');
-                maskCanvas.width = canvas.width;
-                maskCanvas.height = canvas.height;
-                const maskCtx = maskCanvas.getContext('2d');
-                const featherRadius = Math.max(10, maskRadius - safeInset);
-                const featherStart = Math.max(0, featherRadius - featherAmount);
-                const gradient = maskCtx.createRadialGradient(
+                context.save();
+                context.globalCompositeOperation = 'destination-in';
+                const gradient = context.createRadialGradient(
                     maskCenter.x,
                     maskCenter.y,
-                    featherStart,
+                    featherRadius,
                     maskCenter.x,
                     maskCenter.y,
-                    featherRadius
+                    usableRadius
                 );
                 gradient.addColorStop(0, 'rgba(0,0,0,1)');
                 gradient.addColorStop(1, 'rgba(0,0,0,0)');
-                maskCtx.fillStyle = gradient;
-                maskCtx.beginPath();
-                maskCtx.arc(maskCenter.x, maskCenter.y, featherRadius, 0, Math.PI * 2);
-                maskCtx.fill();
-
-                offCtx.globalCompositeOperation = 'destination-in';
-                offCtx.drawImage(maskCanvas, 0, 0);
-                offCtx.globalCompositeOperation = 'source-over';
+                context.fillStyle = gradient;
+                context.beginPath();
+                context.arc(maskCenter.x, maskCenter.y, usableRadius, 0, Math.PI * 2);
+                context.fill();
+                context.restore();
             }
-
-            context.drawImage(offscreen, 0, 0, canvas.width, canvas.height);
         }
 
         function redrawFrameAbovePortrait() {
