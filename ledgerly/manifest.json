@@ -1,0 +1,52 @@
+{
+  "id": "./",
+  "name": "Ledgerly",
+  "short_name": "Ledgerly",
+  "description": "A local-first subscription tracker with a standalone mobile app feel.",
+  "lang": "en-GB",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "display_override": ["window-controls-overlay", "standalone", "minimal-ui"],
+  "orientation": "portrait",
+  "background_color": "#f6f1e8",
+  "theme_color": "#f6f1e8",
+  "categories": ["finance", "productivity", "utilities"],
+  "prefer_related_applications": false,
+  "icons": [
+    {
+      "src": "icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Add subscription",
+      "short_name": "Add",
+      "description": "Jump into the add subscription screen",
+      "url": "./#editor",
+      "icons": [
+        {
+          "src": "icon.svg",
+          "sizes": "any",
+          "type": "image/svg+xml"
+        }
+      ]
+    },
+    {
+      "name": "View renewals",
+      "short_name": "Renewals",
+      "description": "Open the upcoming renewals overview",
+      "url": "./#overview",
+      "icons": [
+        {
+          "src": "icon.svg",
+          "sizes": "any",
+          "type": "image/svg+xml"
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,260 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta name="theme-color" content="#f6f1e8" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <meta name="apple-mobile-web-app-title" content="Ledgerly" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="format-detection" content="telephone=no" />
+    <link rel="manifest" href="manifest.json" />
+    <link rel="icon" href="icon.svg" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="icon.svg" />
+    <link rel="stylesheet" href="styles.css" />
+    <title>Ledgerly</title>
+  </head>
+  <body>
+    <div class="app-shell">
+      <header class="app-bar card">
+        <div class="app-bar-top">
+          <div>
+            <p class="eyebrow">Subscription control center</p>
+            <h1>Ledgerly</h1>
+            <p class="subtle" id="headerSummary">Track renewals, free trials, and monthly burn.</p>
+          </div>
+          <div class="header-actions">
+            <button id="settingsShortcut" class="ghost utility" type="button" aria-controls="section-preferences">Settings</button>
+            <button id="installButton" class="ghost utility hidden" type="button">Install</button>
+            <div id="appModeBadge" class="pill badge-shell">Browser mode</div>
+          </div>
+        </div>
+      </header>
+
+      <nav class="tab-bar card" aria-label="Primary navigation">
+        <button class="tab active" type="button" data-section="overview"><span class="tab-icon">◌</span><span>Overview</span></button>
+        <button class="tab" type="button" data-section="editor"><span class="tab-icon">＋</span><span>Add</span></button>
+        <button class="tab" type="button" data-section="library"><span class="tab-icon">☰</span><span>Subscriptions</span></button>
+      </nav>
+
+      <main class="sections">
+        <section class="screen active" id="section-overview" data-section-panel="overview">
+          <div class="hero-grid">
+            <article class="card hero-card">
+              <div class="hero-topline">Monthly spend</div>
+              <div class="hero-amount" id="heroAmount">£0.00</div>
+              <p class="hero-support" id="heroSupport">Annual total £0.00</p>
+              <div class="hero-insights" id="heroInsights"></div>
+            </article>
+
+            <article class="card attention-card">
+              <div class="section-heading compact">
+                <div>
+                  <p class="eyebrow">Attention</p>
+                  <h2>What needs a look</h2>
+                </div>
+                <button id="resetDemo" class="ghost utility" type="button">Reset demo</button>
+              </div>
+              <div class="attention-list" id="attentionList"></div>
+            </article>
+          </div>
+
+          <div class="card dashboard-card">
+            <div class="section-heading compact">
+              <div>
+                <p class="eyebrow">Snapshot</p>
+                <h2>Overview</h2>
+              </div>
+            </div>
+            <div class="stats" id="stats"></div>
+          </div>
+
+          <div class="card stack-card">
+            <div class="section-heading compact">
+              <div>
+                <p class="eyebrow">Next up</p>
+                <h2>Upcoming renewals</h2>
+              </div>
+              <span id="upcomingCount" class="pill"></span>
+            </div>
+            <div id="upcomingList" class="renewal-list"></div>
+          </div>
+        </section>
+
+        <section class="screen" id="section-editor" data-section-panel="editor">
+          <div class="card form-card">
+            <div class="section-heading compact">
+              <div>
+                <p class="eyebrow">Subscription editor</p>
+                <h2 id="formTitle">Add subscription</h2>
+              </div>
+              <button id="cancelEdit" class="ghost utility hidden" type="button">Cancel</button>
+            </div>
+
+            <form id="subscriptionForm" class="form">
+              <input type="hidden" id="subscriptionId" />
+              <input type="hidden" id="cycle" value="monthly" />
+
+              <section class="form-group">
+                <div class="group-heading">
+                  <h3>Basics</h3>
+                  <p>Lead with the service, price, and billing cadence.</p>
+                </div>
+
+                <label>
+                  <span>Name</span>
+                  <input id="name" required maxlength="80" placeholder="Spotify" />
+                </label>
+
+                <div class="split">
+                  <label>
+                    <span>Price</span>
+                    <input id="price" type="number" min="0" step="0.01" inputmode="decimal" required placeholder="9.99" />
+                  </label>
+                  <label>
+                    <span>Category</span>
+                    <input id="category" maxlength="40" placeholder="Entertainment" />
+                  </label>
+                </div>
+
+                <div>
+                  <span class="field-label">Billing cycle</span>
+                  <div class="segmented" id="cycleSegmented" role="tablist" aria-label="Billing cycle">
+                    <button type="button" class="segment active" data-cycle="monthly">Monthly</button>
+                    <button type="button" class="segment" data-cycle="yearly">Yearly</button>
+                    <button type="button" class="segment" data-cycle="custom">Custom</button>
+                  </div>
+                  <p class="helper-text" id="cycleHelper">Best for subscriptions that renew every month.</p>
+                </div>
+              </section>
+
+              <section class="form-group">
+                <div class="group-heading">
+                  <h3>Renewal</h3>
+                  <p>Capture the next payment date and whether it still needs attention.</p>
+                </div>
+
+                <label>
+                  <span>Next payment date</span>
+                  <input id="nextPaymentDate" type="date" required />
+                </label>
+
+                <div class="toggle-grid">
+                  <label class="toggle-card" for="trial">
+                    <input id="trial" type="checkbox" />
+                    <div>
+                      <strong>Trial</strong>
+                      <small>Flag it so it stands out before billing kicks in.</small>
+                    </div>
+                  </label>
+                  <label class="toggle-card active-toggle" for="active">
+                    <input id="active" type="checkbox" checked />
+                    <div>
+                      <strong>Active</strong>
+                      <small>Turn this off to keep the record without counting it in totals.</small>
+                    </div>
+                  </label>
+                </div>
+              </section>
+
+              <section class="form-group">
+                <div class="group-heading">
+                  <h3>Details</h3>
+                  <p>Optional context for later-you.</p>
+                </div>
+
+                <label>
+                  <span>Notes</span>
+                  <textarea id="notes" rows="4" placeholder="Cancel before the next cycle"></textarea>
+                </label>
+              </section>
+
+              <div class="actions sticky-actions">
+                <button type="submit" class="primary" id="saveButton">Save subscription</button>
+              </div>
+            </form>
+          </div>
+        </section>
+
+        <section class="screen" id="section-library" data-section-panel="library">
+          <div class="card list-card">
+            <div class="section-heading compact">
+              <div>
+                <p class="eyebrow">Library</p>
+                <h2>Subscriptions</h2>
+              </div>
+              <span id="subscriptionCount" class="pill"></span>
+            </div>
+
+            <div class="library-controls">
+              <label class="search-field">
+                <span class="field-label">Search</span>
+                <input id="searchInput" type="search" placeholder="Search by name, category, or notes" />
+              </label>
+              <div class="control-row">
+                <label>
+                  <span class="field-label">Filter</span>
+                  <select id="filterSelect">
+                    <option value="all">All subscriptions</option>
+                    <option value="active">Active</option>
+                    <option value="trial">Trial</option>
+                    <option value="cancelled">Cancelled</option>
+                    <option value="due-soon">Due in 7 days</option>
+                  </select>
+                </label>
+                <label>
+                  <span class="field-label">Sort</span>
+                  <select id="sortSelect">
+                    <option value="renewal-asc">Next renewal</option>
+                    <option value="price-desc">Highest price</option>
+                    <option value="price-asc">Lowest price</option>
+                    <option value="name-asc">A to Z</option>
+                    <option value="name-desc">Z to A</option>
+                    <option value="newest">Newest</option>
+                  </select>
+                </label>
+              </div>
+              <div id="activeFilters" class="active-filters"></div>
+            </div>
+
+            <div id="subscriptionList" class="subscription-list"></div>
+          </div>
+        </section>
+
+        <section class="screen" id="section-preferences" data-section-panel="preferences">
+          <div class="card preferences-card">
+            <div class="section-heading compact">
+              <div>
+                <p class="eyebrow">Settings</p>
+                <h2>Locale & currency</h2>
+              </div>
+              <button id="closeSettings" class="ghost utility" type="button">Back</button>
+            </div>
+
+            <div class="preference-summary" id="preferenceSummary"></div>
+
+            <div class="form preference-form">
+              <label>
+                <span>Locale</span>
+                <input id="localeInput" placeholder="Auto (browser locale)" spellcheck="false" />
+                <small>Leave blank for automatic browser detection, or enter a locale like <code>en-GB</code> or <code>en-US</code>.</small>
+              </label>
+              <label>
+                <span>Currency</span>
+                <select id="currencySelect"></select>
+                <small>Use automatic currency detection or pin a specific currency for totals and prices.</small>
+              </label>
+              <div class="actions split-actions">
+                <button id="savePreferences" type="button" class="primary">Save settings</button>
+                <button id="resetPreferences" type="button" class="ghost">Reset to automatic</button>
+              </div>
+            </div>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <script src="app.js" type="module"></script>
+  </body>
+</html>
