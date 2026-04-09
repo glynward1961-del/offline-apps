@@ -1,5 +1,6 @@
 const STORAGE_KEY = 'ledgerly.subscriptions.v1';
 const SETTINGS_KEY = 'ledgerly.settings.v1';
+const STORAGE_TEST_KEY = 'ledgerly.storage-check.v1';
 const CURRENCY_OPTIONS = ['auto', 'GBP', 'USD', 'EUR', 'AUD', 'CAD', 'NZD', 'JPY', 'CHF', 'SEK', 'NOK', 'DKK'];
 const CYCLE_LABELS = {
   monthly: 'Monthly',
@@ -67,7 +68,7 @@ const demoSubscriptions = [
 ];
 
 let subscriptions = loadSubscriptions();
-if (!subscriptions.length) {
+if (subscriptions === null) {
   subscriptions = demoSubscriptions.map(item => ({ ...item }));
   saveSubscriptions();
 }
@@ -76,6 +77,7 @@ let settings = loadSettings();
 let formatterState = buildFormatterState(settings);
 let deferredPrompt = null;
 let libraryState = { search: '', filter: 'all', sort: 'renewal-asc' };
+const storageAvailable = canUseLocalStorage();
 
 populateCurrencySelect();
 fillSettingsForm();
@@ -85,6 +87,11 @@ setActiveSection(readInitialSection(), { pushHash: false });
 renderInstallState();
 render();
 registerSW();
+if (!storageAvailable) {
+  window.setTimeout(() => {
+    alert('Ledgerly cannot save data in this browser right now. On mobile, this usually means private browsing or restricted site storage.');
+  }, 200);
+}
 
 els.form.addEventListener('submit', onSubmit);
 els.cancelEdit.addEventListener('click', clearForm);
@@ -141,15 +148,23 @@ function toISODate(date) {
 
 function loadSubscriptions() {
   try {
-    const parsed = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (raw === null) return null;
+    const parsed = JSON.parse(raw);
     return Array.isArray(parsed) ? parsed : [];
   } catch {
-    return [];
+    return null;
   }
 }
 
 function saveSubscriptions() {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(subscriptions));
+  if (!storageAvailable) return false;
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(subscriptions));
+    return true;
+  } catch {
+    return false;
+  }
 }
 
 function loadSettings() {
@@ -165,7 +180,23 @@ function loadSettings() {
 }
 
 function saveSettings() {
-  localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings));
+  if (!storageAvailable) return false;
+  try {
+    localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings));
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+function canUseLocalStorage() {
+  try {
+    localStorage.setItem(STORAGE_TEST_KEY, 'ok');
+    localStorage.removeItem(STORAGE_TEST_KEY);
+    return true;
+  } catch {
+    return false;
+  }
 }
 
 function normalizeLocaleOrAuto(value) {
@@ -627,7 +658,9 @@ function savePreferences() {
 
   settings = { locale: nextLocale, currency: nextCurrency };
   formatterState = buildFormatterState(settings);
-  saveSettings();
+  if (!saveSettings()) {
+    alert('Ledgerly could not save your preferences on this device. Please check browser storage permissions.');
+  }
   fillSettingsForm();
   render();
 }
@@ -635,7 +668,9 @@ function savePreferences() {
 function resetPreferences() {
   settings = { locale: 'auto', currency: 'auto' };
   formatterState = buildFormatterState(settings);
-  saveSettings();
+  if (!saveSettings()) {
+    alert('Ledgerly could not reset your preferences on this device because browser storage is unavailable.');
+  }
   fillSettingsForm();
   render();
 }
