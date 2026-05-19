@@ -1,0 +1,706 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="theme-color" content="#0f172a">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>FC26 Meta Tactics</title>
+<link rel="icon" type="image/png" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ctext y='28' font-size='28'%3E%E2%9A%BD%3C/text%3E%3C/svg%3E">
+<style>
+  :root {
+    --bg: #0f172a;
+    --surface: #1e293b;
+    --surface2: #334155;
+    --accent: #22d3ee;
+    --accent2: #38bdf8;
+    --gold: #fbbf24;
+    --text: #f1f5f9;
+    --text2: #94a3b8;
+    --green: #4ade80;
+    --red: #f87171;
+    --radius: 12px;
+    --radius-sm: 8px;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  html, body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100dvh;
+    -webkit-font-smoothing: antialiased;
+  }
+  body { padding-bottom: 80px; }
+
+  .header {
+    background: linear-gradient(135deg, #0f172a 0%, #1e3a5f 100%);
+    padding: 20px 16px 16px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    border-bottom: 1px solid var(--surface2);
+  }
+  .header h1 {
+    font-size: 22px;
+    font-weight: 800;
+    letter-spacing: -0.5px;
+  }
+  .header h1 span { color: var(--accent); }
+  .header .sub {
+    font-size: 13px;
+    color: var(--text2);
+    margin-top: 2px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .header .sub .dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: var(--green);
+    display: inline-block;
+  }
+
+  .filters {
+    display: flex;
+    gap: 8px;
+    padding: 12px 16px;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    background: var(--bg);
+    position: sticky;
+    top: 85px;
+    z-index: 99;
+  }
+  .filters::-webkit-scrollbar { display: none; }
+  .filter-btn {
+    flex-shrink: 0;
+    padding: 8px 16px;
+    border-radius: 20px;
+    border: 1px solid var(--surface2);
+    background: var(--surface);
+    color: var(--text2);
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    white-space: nowrap;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .filter-btn.active {
+    background: var(--accent);
+    color: #0f172a;
+    border-color: var(--accent);
+  }
+
+  .container { padding: 8px 16px; }
+  .tactic-card {
+    background: var(--surface);
+    border-radius: var(--radius);
+    margin-bottom: 12px;
+    overflow: hidden;
+    border: 1px solid var(--surface2);
+    transition: border-color 0.2s;
+  }
+  .tactic-card:active { border-color: var(--accent2); }
+
+  .card-header {
+    padding: 16px;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .card-header .left { flex: 1; }
+  .card-header .name {
+    font-size: 17px;
+    font-weight: 700;
+  }
+  .card-header .meta-tag {
+    display: inline-block;
+    background: linear-gradient(135deg, var(--gold), #f59e0b);
+    color: #0f172a;
+    font-size: 10px;
+    font-weight: 800;
+    padding: 2px 8px;
+    border-radius: 4px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-left: 8px;
+    vertical-align: middle;
+  }
+  .card-header .usage {
+    font-size: 12px;
+    color: var(--text2);
+    margin-top: 4px;
+  }
+  .card-header .code-badge {
+    background: var(--surface2);
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-size: 11px;
+    font-family: 'SF Mono', 'Fira Code', monospace;
+    color: var(--accent2);
+    letter-spacing: 0.3px;
+    flex-shrink: 0;
+  }
+
+  .section {
+    margin-top: 12px;
+  }
+  .section-title {
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    color: var(--accent2);
+    margin-bottom: 8px;
+  }
+  .section-title.gold { color: var(--gold); }
+  .section-title.green { color: var(--green); }
+
+  .tactic-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 6px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+    font-size: 14px;
+  }
+  .tactic-row:last-child { border-bottom: none; }
+  .tactic-row .label { color: var(--text2); }
+  .tactic-row .value { font-weight: 600; text-align: right; }
+
+  .formation-preview {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    background: var(--bg);
+    border-radius: var(--radius-sm);
+    padding: 12px;
+    margin-bottom: 12px;
+  }
+  .formation-preview .pitch-label {
+    font-size: 26px;
+    font-weight: 800;
+    color: var(--accent);
+    letter-spacing: -1px;
+  }
+  .formation-preview .pitch-icon {
+    font-size: 36px;
+  }
+
+  .player-types {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 4px;
+  }
+  .player-chip {
+    background: var(--surface2);
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-size: 12px;
+    color: var(--text);
+  }
+  .player-chip .pos {
+    font-weight: 700;
+    color: var(--accent);
+    margin-right: 4px;
+  }
+  .player-chip .note {
+    color: var(--text2);
+    font-size: 11px;
+  }
+
+  .pro-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 4px;
+  }
+  .pro-chip {
+    background: linear-gradient(135deg, var(--gold), #f59e0b);
+    color: #0f172a;
+    padding: 3px 10px;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 700;
+  }
+
+  .bottom-nav {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: var(--surface);
+    border-top: 1px solid var(--surface2);
+    display: flex;
+    padding: 8px 0;
+    padding-bottom: max(8px, env(safe-area-inset-bottom));
+    z-index: 100;
+  }
+  .nav-item {
+    flex: 1;
+    text-align: center;
+    font-size: 11px;
+    color: var(--text2);
+    cursor: pointer;
+    padding: 4px 0;
+    transition: color 0.2s;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .nav-item.active { color: var(--accent); }
+  .nav-item .icon { font-size: 22px; display: block; margin-bottom: 2px; }
+
+  .detail-view {
+    display: none;
+  }
+  .detail-view.active { display: block; }
+
+  .back-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 14px;
+    color: var(--accent2);
+    cursor: pointer;
+    margin-bottom: 12px;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .patch-note {
+    background: linear-gradient(135deg, #1e293b, #1a2332);
+    border: 1px solid var(--surface2);
+    border-radius: var(--radius);
+    padding: 16px;
+    margin-bottom: 12px;
+  }
+  .patch-note .date {
+    font-size: 11px;
+    color: var(--text2);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  .patch-note .title {
+    font-size: 16px;
+    font-weight: 700;
+    margin: 4px 0 8px;
+  }
+  .patch-note .desc {
+    font-size: 14px;
+    color: var(--text2);
+    line-height: 1.5;
+  }
+
+  @media (max-width: 380px) {
+    .header h1 { font-size: 19px; }
+    .card-header .name { font-size: 15px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>Meta <span>Tactics</span></h1>
+  <div class="sub"><span class="dot"></span> FC26 — Post-TOTS Patch</div>
+</div>
+
+<div class="filters" id="filters">
+  <button class="filter-btn active" data-filter="all">All</button>
+  <button class="filter-btn" data-filter="meta">🔥 Meta</button>
+  <button class="filter-btn" data-filter="defensive">Defensive</button>
+  <button class="filter-btn" data-filter="attacking">Attacking</button>
+  <button class="filter-btn" data-filter="narrow">Narrow</button>
+  <button class="filter-btn" data-filter="wide">Wide</button>
+</div>
+
+<!-- Tactic List -->
+<div class="container" id="listView">
+  <div id="tacticList"></div>
+</div>
+
+<!-- Detail View -->
+<div class="container" id="detailView" style="display:none">
+  <div class="back-btn" id="backBtn">← Back to tactics</div>
+  <div id="detailContent"></div>
+</div>
+
+<!-- About View -->
+<div class="container">
+  <div class="detail-view" id="aboutView">
+    <div class="patch-note">
+      <div class="date">Post-TOTS Patch</div>
+      <div class="title">FC26 Meta Landscape</div>
+      <div class="desc">
+        These are the current meta formations and tactics used by top players and pros in FC26 after the latest TOTS patch.
+        Formations are ranked by community usage and pro adoption. Data sourced from Team Gullit, Dexerto, and community consensus.
+      </div>
+    </div>
+    <div class="patch-note">
+      <div class="date">Key Principle</div>
+      <div class="title">61 Depth Meta</div>
+      <div class="desc">
+        Most pro tactics use exactly <strong>61 depth</strong> with a "High" defensive approach. This activates aggressive AI defending — defenders push up, mark reliably, trigger auto-offside traps, and stay compact without being too exposed.
+      </div>
+    </div>
+    <div class="patch-note">
+      <div class="date">Player Roles Are Everything</div>
+      <div class="title">Roles & Playstyles</div>
+      <div class="desc">
+        Specific player roles (Inside Forward, Box-to-Box, Shadow Striker) and Playstyles (Incisive+, Intercept+, Quick Step+, Finesse+) are critical. Having the right roles activated makes or breaks a tactic in FC26.
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Bottom Navigation -->
+<div class="bottom-nav">
+  <div class="nav-item active" id="navTactics">
+    <span class="icon">📋</span>
+    Tactics
+  </div>
+  <div class="nav-item" id="navAbout">
+    <span class="icon">ℹ️</span>
+    About
+  </div>
+</div>
+
+<script>
+const tactics = [
+  {
+    id: '451',
+    name: '4-5-1',
+    short: '4-5-1 Flat',
+    meta: true,
+    tags: ['meta', 'defensive', 'wide'],
+    code: 'LZ$bkTLTVJ#N',
+    usage: "World Champion's choice — #1 meta",
+    pros: ['Manuel Bachoore'],
+    formationIcon: '4-5-1',
+    tactics: [
+      { label: 'Build-up Style', value: 'Balanced' },
+      { label: 'Defensive Approach', value: 'High (70)' },
+      { label: 'GK', value: 'Sweeper Keeper — Balanced' },
+      { label: 'LB/RB', value: 'Full Back — Balanced' },
+      { label: 'CBs', value: 'Defender — Defend' },
+      { label: 'CMs', value: 'Box-to-Box — Balanced' },
+      { label: 'LM', value: 'Inside Forward — Balanced' },
+      { label: 'RM', value: 'Inside Forward — Balanced' },
+      { label: 'ST', value: 'False 9 — Attack' }
+    ],
+    playerTypes: [
+      { pos: 'ST', note: 'False 9 — good passing/agility, drops deep' },
+      { pos: 'LM/RM', note: 'Pacey Inside Forwards, good dribbling' },
+      { pos: 'CM', note: 'Box-to-Box all-rounders, high stamina' },
+      { pos: 'CB', note: 'Intercept+, Anticipate+' },
+      { pos: 'GK', note: 'Sweeper Keeper with good passing' }
+    ]
+  },
+  {
+    id: '4411',
+    name: '4-4-1-1',
+    short: '4-4-1-1 Midfield',
+    meta: true,
+    tags: ['meta', 'balanced', 'wide'],
+    code: 'BJbr#FRJL@?D',
+    usage: 'Most common formation post-patch',
+    pros: ['Multiple pros'],
+    formationIcon: '4-4-1-1',
+    tactics: [
+      { label: 'Build-up Style', value: 'Balanced' },
+      { label: 'Defensive Approach', value: 'High (70)' },
+      { label: 'GK', value: 'Sweeper Keeper — Balanced' },
+      { label: 'LB/RB', value: 'Full Back — Balanced' },
+      { label: 'CBs', value: 'Defender — Defend' },
+      { label: 'CAM', value: 'Shadow Striker — Attack' },
+      { label: 'CMs', value: 'Box-to-Box — Balanced' },
+      { label: 'LM', value: 'Inside Forward — Balanced' },
+      { label: 'RM', value: 'Winger — Balanced' },
+      { label: 'ST', value: 'Advanced Forward — Attack' }
+    ],
+    playerTypes: [
+      { pos: 'CAM', note: 'Incisive+ essential, good dribbling' },
+      { pos: 'CM', note: 'Box-to-Box — FUT Bday Joelinton, TOTS Szoboszlai type' },
+      { pos: 'LM/RM', note: 'Pacey, Finesse+ playstyle' },
+      { pos: 'ST', note: 'Advanced Forward — pace, Quick Step+' },
+      { pos: 'CB', note: 'Aggressive AI defenders' }
+    ]
+  },
+  {
+    id: '442',
+    name: '4-4-2',
+    short: '4-4-2 Flat',
+    meta: true,
+    tags: ['meta', 'balanced', 'wide'],
+    code: 'L5$VUvLTVJJN',
+    usage: 'Classic balanced meta',
+    pros: ['Manuel Bachoore', 'Levi de Weerd'],
+    formationIcon: '4-4-2',
+    tactics: [
+      { label: 'Build-up Style', value: 'Balanced' },
+      { label: 'Defensive Approach', value: 'High (70)' },
+      { label: 'GK', value: 'Ball Playing — Build-up' },
+      { label: 'LB/RB', value: 'Full Back — Balanced' },
+      { label: 'CBs', value: 'Defender — Defend' },
+      { label: 'CM (L)', value: 'Box-to-Box — Balanced' },
+      { label: 'CM (R)', value: 'Holding — Defend' },
+      { label: 'LM', value: 'Inside Forward — Balanced' },
+      { label: 'RM', value: 'Inside Forward — Balanced' },
+      { label: 'STs', value: 'Advanced Forward — Attack' }
+    ],
+    playerTypes: [
+      { pos: 'ST', note: 'Two Advanced Forwards — pace + finishing' },
+      { pos: 'CM (L)', note: 'Box-to-Box engine, all-round' },
+      { pos: 'CM (R)', note: 'Stay-back defensive anchor' },
+      { pos: 'LM/RM', note: 'Inside Forward, cut inside threat' },
+      { pos: 'GK', note: 'Ball Playing GK for build-up' }
+    ]
+  },
+  {
+    id: '4231w',
+    name: '4-2-3-1 Wide',
+    short: '4-2-3-1 Wide',
+    meta: true,
+    tags: ['meta', 'defensive', 'wide'],
+    code: '6YSkAqqCE428',
+    usage: 'Safe balanced starter formation',
+    pros: ['Various'],
+    formationIcon: '4-2-3-1',
+    tactics: [
+      { label: 'Build-up Style', value: 'Balanced' },
+      { label: 'Defensive Approach', value: 'High (70)' },
+      { label: 'GK', value: 'Goalkeeper — Defend' },
+      { label: 'LB/RB', value: 'Full Back — Balanced' },
+      { label: 'CBs', value: 'Defender — Defend' },
+      { label: 'CDM (L)', value: 'Holding — Defend' },
+      { label: 'CDM (R)', value: 'Deep-Lying Playmaker — Build-Up' },
+      { label: 'CAM', value: 'Playmaker — Balanced' },
+      { label: 'LM', value: 'Inside Forward — Balanced' },
+      { label: 'RM', value: 'Inside Forward — Balanced' },
+      { label: 'ST', value: 'Advanced Forward — Attack' }
+    ],
+    playerTypes: [
+      { pos: 'ST', note: 'Strong striker — holds up play' },
+      { pos: 'CDM (L)', note: 'Pure defensive anchor' },
+      { pos: 'CDM (R)', note: 'DLP — passing/vision' },
+      { pos: 'CAM', note: 'Playmaker with good passing range' },
+      { pos: 'LM/RM', note: 'Inside Forward with pace' }
+    ]
+  },
+  {
+    id: '4213',
+    name: '4-2-1-3',
+    short: '4-2-1-3',
+    meta: true,
+    tags: ['meta', 'attacking', 'wide'],
+    code: '',
+    usage: 'Fast counter-attacking option',
+    pros: ['Multiple pros'],
+    formationIcon: '4-2-1-3',
+    tactics: [
+      { label: 'Build-up Style', value: 'Balanced' },
+      { label: 'Defensive Approach', value: 'High (61)' },
+      { label: 'GK', value: 'Sweeper Keeper — Balanced' },
+      { label: 'LB/RB', value: 'Full Back — Balanced' },
+      { label: 'CDM (L)', value: 'Deep-Lying Playmaker — Build-Up' },
+      { label: 'CDM (R)', value: 'Holding — Defend' },
+      { label: 'CAM', value: 'Playmaker — Balanced' },
+      { label: 'LW', value: 'Inside Forward — Balanced' },
+      { label: 'RW', value: 'Inside Forward — Balanced' },
+      { label: 'ST', value: 'Advanced Forward — Attack' }
+    ],
+    playerTypes: [
+      { pos: 'CDM', note: 'One DLP + one Holding — Intercept+' },
+      { pos: 'CAM', note: 'Playmaker, Incisive+ and Bruiser+' },
+      { pos: 'LW/RW', note: 'Quick Step+, Finesse+' },
+      { pos: 'ST', note: 'Advanced Forward, pace + finishing' }
+    ]
+  },
+  {
+    id: '433',
+    name: '4-3-3 (2) Holding',
+    short: '4-3-3 (Holding)',
+    meta: true,
+    tags: ['meta', 'attacking', 'wide'],
+    code: '',
+    usage: 'Tighter defence, overloads box',
+    pros: ['Various'],
+    formationIcon: '4-3-3',
+    tactics: [
+      { label: 'Build-up Style', value: 'Balanced' },
+      { label: 'Defensive Approach', value: 'High (61)' },
+      { label: 'GK', value: 'Sweeper Keeper — Balanced' },
+      { label: 'LB/RB', value: 'Full Back — Balanced' },
+      { label: 'CBs', value: 'Defender — Defend' },
+      { label: 'CDM', value: 'Holding — Defend' },
+      { label: 'CM (L)', value: 'Box-to-Box — Balanced' },
+      { label: 'CM (R)', value: 'Box-to-Box — Balanced' },
+      { label: 'LW', value: 'Inside Forward — Balanced' },
+      { label: 'RW', value: 'Inside Forward — Balanced' },
+      { label: 'ST', value: 'Advanced Forward — Attack' }
+    ],
+    playerTypes: [
+      { pos: 'CDM', note: 'Rock — TOTS Casemiro, WW Vieira type' },
+      { pos: 'CM (L)', note: 'Good defending + passing/dribbling' },
+      { pos: 'CM (R)', note: 'Ultimate B2B — De Jong, TOTS Sangaré' },
+      { pos: 'LW/RW', note: 'Quick Step+, Finesse+, Low Driven+' },
+      { pos: 'ST', note: 'Pacey Advanced Forward' }
+    ]
+  },
+  {
+    id: '4222',
+    name: '4-2-2-2',
+    short: '4-2-2-2',
+    meta: false,
+    tags: ['attacking', 'narrow'],
+    code: 'ygL8b8k68wPy',
+    usage: 'More offensive than 4231',
+    pros: ['Various'],
+    formationIcon: '4-2-2-2',
+    tactics: [
+      { label: 'Build-up Style', value: 'Balanced' },
+      { label: 'Defensive Approach', value: 'Balanced (50)' },
+      { label: 'GK', value: 'Sweeper Keeper — Balanced' },
+      { label: 'LB/RB', value: 'Full Back — Balanced' },
+      { label: 'CBs', value: 'Defender — Defend' },
+      { label: 'CDMs', value: 'Deep-Lying Playmaker — Build-Up' },
+      { label: 'CAM (L)', value: 'Playmaker — Roaming' },
+      { label: 'CAM (R)', value: 'Shadow Striker — Attack' },
+      { label: 'STs', value: 'Advanced Forward — Attack' }
+    ],
+    playerTypes: [
+      { pos: 'ST', note: 'Advanced Forward + False 9 combo' },
+      { pos: 'CAM', note: 'One roaming Playmaker, one Shadow Striker' },
+      { pos: 'CDM', note: 'Both DLPs — passing essential' }
+    ]
+  }
+];
+
+// ─── STATE ────────────────────────
+let currentFilter = 'all';
+
+function getFiltered(tag) {
+  if (tag === 'all') return tactics;
+  return tactics.filter(t => t.tags.includes(tag));
+}
+
+// ─── RENDER LIST ──────────────────
+function renderList(filter) {
+  currentFilter = filter;
+  const el = document.getElementById('tacticList');
+  const items = getFiltered(filter);
+
+  document.querySelectorAll('.filter-btn').forEach(b => {
+    b.classList.toggle('active', b.dataset.filter === filter);
+  });
+
+  if (!items.length) {
+    el.innerHTML = `<div class="empty-state"><div class="icon">🔍</div><h3>No tactics found</h3></div>`;
+    return;
+  }
+
+  el.innerHTML = items.map(t => {
+    const codeHtml = t.code ? `<div class="code-badge">${t.code}</div>` : '';
+    const metaHtml = t.meta ? '<span class="meta-tag">🔥 Meta</span>' : '';
+    return `<div class="tactic-card" onclick="openDetail('${t.id}')">
+      <div class="card-header">
+        <div class="left">
+          <div class="name">${t.name} ${metaHtml}</div>
+          <div class="usage">${t.usage}</div>
+        </div>
+        ${codeHtml}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ─── RENDER DETAIL ────────────────
+function openDetail(id) {
+  const t = tactics.find(x => x.id === id);
+  if (!t) return;
+
+  document.getElementById('listView').style.display = 'none';
+  document.getElementById('detailView').style.display = 'block';
+
+  const metaHtml = t.meta ? '<span class="meta-tag" style="font-size:10px;margin-left:6px;">🔥 Meta</span>' : '';
+  const codeHtml = t.code ? `<div class="code-badge">${t.code}</div>` : '';
+  const prosHtml = t.pros.map(p => `<span class="pro-chip">${p}</span>`).join('');
+  const playerHtml = t.playerTypes.map(p =>
+    `<div class="player-chip"><span class="pos">${p.pos}</span>${p.note}</div>`
+  ).join('');
+  const tacticRows = t.tactics.map(r =>
+    `<div class="tactic-row"><span class="label">${r.label}</span><span class="value">${r.value}</span></div>`
+  ).join('');
+
+  document.getElementById('detailContent').innerHTML = `
+    <div class="tactic-card" style="border-color:${t.meta ? 'var(--gold)' : 'var(--surface2)'}">
+      <div style="padding:16px;">
+        <div class="formation-preview">
+          <div class="pitch-icon">⚽</div>
+          <div class="pitch-label">${t.formationIcon}</div>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+          <div>
+            <div style="font-size:20px;font-weight:700;">${t.name} ${metaHtml}</div>
+            <div style="font-size:13px;color:var(--text2);margin-top:2px;">${t.short}</div>
+          </div>
+          ${codeHtml}
+        </div>
+
+        <div class="section">
+          <div class="section-title gold">📋 Custom Tactics</div>
+          ${tacticRows}
+        </div>
+
+        <div class="section">
+          <div class="section-title">🎯 Player Types</div>
+          <div class="player-types">${playerHtml}</div>
+        </div>
+
+        <div class="section" style="margin-bottom:4px;">
+          <div class="section-title green">🏆 Used By</div>
+          <div class="pro-list">${prosHtml}</div>
+        </div>
+      </div>
+    </div>`;
+}
+
+function closeDetail() {
+  document.getElementById('detailView').style.display = 'none';
+  document.getElementById('listView').style.display = 'block';
+}
+
+// ─── VIEW SWITCHING ──────────────
+function showTactics() {
+  document.getElementById('listView').style.display = 'block';
+  document.getElementById('detailView').style.display = 'none';
+  document.getElementById('aboutView').classList.remove('active');
+  document.getElementById('navTactics').classList.add('active');
+  document.getElementById('navAbout').classList.remove('active');
+}
+
+function showAbout() {
+  document.getElementById('listView').style.display = 'none';
+  document.getElementById('detailView').style.display = 'none';
+  document.getElementById('aboutView').classList.add('active');
+  document.getElementById('navTactics').classList.remove('active');
+  document.getElementById('navAbout').classList.add('active');
+}
+
+// ─── INIT ─────────────────────────
+document.querySelectorAll('.filter-btn').forEach(btn => {
+  btn.addEventListener('click', () => renderList(btn.dataset.filter));
+});
+document.getElementById('backBtn').addEventListener('click', closeDetail);
+document.getElementById('navTactics').addEventListener('click', showTactics);
+document.getElementById('navAbout').addEventListener('click', showAbout);
+
+renderList('all');
+</script>
+</body>
+</html>
