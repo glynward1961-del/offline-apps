@@ -7,7 +7,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <title>FC26 Meta Tactics</title>
-<link rel="icon" type="image/png" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ctext y='28' font-size='28'%3E%E2%9A%BD%3C/text%3E%3C/svg%3E">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ctext y='28' font-size='28'%3E%E2%9A%BD%3C/text%3E%3C/svg%3E">
 <style>
   :root {
     --bg: #0f172a;
@@ -16,10 +16,11 @@
     --accent: #22d3ee;
     --accent2: #38bdf8;
     --gold: #fbbf24;
+    --green: #4ade80;
+    --rose: #f43f5e;
     --text: #f1f5f9;
     --text2: #94a3b8;
-    --green: #4ade80;
-    --red: #f87171;
+    --text3: #64748b;
     --radius: 12px;
     --radius-sm: 8px;
   }
@@ -35,67 +36,55 @@
 
   .header {
     background: linear-gradient(135deg, #0f172a 0%, #1e3a5f 100%);
-    padding: 20px 16px 16px;
+    padding: 20px 16px 14px;
     position: sticky;
     top: 0;
     z-index: 100;
     border-bottom: 1px solid var(--surface2);
   }
-  .header h1 {
-    font-size: 22px;
-    font-weight: 800;
-    letter-spacing: -0.5px;
-  }
+  .header h1 { font-size: 22px; font-weight: 800; letter-spacing: -0.5px; }
   .header h1 span { color: var(--accent); }
   .header .sub {
-    font-size: 13px;
+    font-size: 12px;
     color: var(--text2);
     margin-top: 2px;
     display: flex;
     align-items: center;
     gap: 6px;
   }
-  .header .sub .dot {
-    width: 6px; height: 6px;
-    border-radius: 50%;
-    background: var(--green);
-    display: inline-block;
-  }
+  .header .sub .dot { width:6px; height:6px; border-radius:50%; background:var(--green); display:inline-block; }
 
   .filters {
     display: flex;
     gap: 8px;
-    padding: 12px 16px;
+    padding: 10px 16px;
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
     scrollbar-width: none;
     background: var(--bg);
     position: sticky;
-    top: 85px;
+    top: 73px;
     z-index: 99;
   }
-  .filters::-webkit-scrollbar { display: none; }
+  .filters::-webkit-scrollbar { display:none; }
   .filter-btn {
     flex-shrink: 0;
-    padding: 8px 16px;
+    padding: 7px 14px;
     border-radius: 20px;
     border: 1px solid var(--surface2);
     background: var(--surface);
     color: var(--text2);
-    font-size: 13px;
+    font-size: 12px;
     font-weight: 600;
     cursor: pointer;
     transition: all 0.2s;
     white-space: nowrap;
     -webkit-tap-highlight-color: transparent;
   }
-  .filter-btn.active {
-    background: var(--accent);
-    color: #0f172a;
-    border-color: var(--accent);
-  }
+  .filter-btn.active { background:var(--accent); color:#0f172a; border-color:var(--accent); }
 
   .container { padding: 8px 16px; }
+
   .tactic-card {
     background: var(--surface);
     border-radius: var(--radius);
@@ -103,203 +92,221 @@
     overflow: hidden;
     border: 1px solid var(--surface2);
     transition: border-color 0.2s;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
   }
   .tactic-card:active { border-color: var(--accent2); }
 
-  .card-header {
-    padding: 16px;
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    cursor: pointer;
-    -webkit-tap-highlight-color: transparent;
-  }
-  .card-header .left { flex: 1; }
-  .card-header .name {
-    font-size: 17px;
-    font-weight: 700;
-  }
+  .card-header { padding: 14px 16px; }
+  .card-header .top-row { display:flex; justify-content:space-between; align-items:flex-start; }
+  .card-header .name { font-size:17px; font-weight:700; }
   .card-header .meta-tag {
-    display: inline-block;
+    display:inline-block;
     background: linear-gradient(135deg, var(--gold), #f59e0b);
-    color: #0f172a;
-    font-size: 10px;
-    font-weight: 800;
-    padding: 2px 8px;
-    border-radius: 4px;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    margin-left: 8px;
-    vertical-align: middle;
+    color:#0f172a;
+    font-size:9px;
+    font-weight:800;
+    padding:2px 7px;
+    border-radius:4px;
+    text-transform:uppercase;
+    letter-spacing:0.4px;
+    margin-left:6px;
+    vertical-align:middle;
   }
-  .card-header .usage {
-    font-size: 12px;
-    color: var(--text2);
-    margin-top: 4px;
-  }
+  .card-header .usage { font-size:12px; color:var(--text2); margin-top:3px; }
   .card-header .code-badge {
-    background: var(--surface2);
-    padding: 4px 10px;
-    border-radius: 6px;
-    font-size: 11px;
-    font-family: 'SF Mono', 'Fira Code', monospace;
-    color: var(--accent2);
-    letter-spacing: 0.3px;
-    flex-shrink: 0;
+    background:var(--surface2);
+    padding:3px 8px;
+    border-radius:5px;
+    font-size:10px;
+    font-family:'SF Mono','Fira Code',monospace;
+    color:var(--accent2);
+    letter-spacing:0.3px;
+    flex-shrink:0;
   }
+  .card-header .tags {
+    display:flex;
+    gap:4px;
+    margin-top:8px;
+    flex-wrap:wrap;
+  }
+  .card-header .tag {
+    font-size:10px;
+    padding:2px 8px;
+    border-radius:10px;
+    background:var(--surface2);
+    color:var(--text2);
+  }
+  .card-header .tag.gold { background:rgba(251,191,36,0.15); color:var(--gold); }
+  .card-header .tag.green { background:rgba(74,222,128,0.15); color:var(--green); }
+  .card-header .tag.rose { background:rgba(244,63,94,0.15); color:var(--rose); }
+  .card-header .tag.blue { background:rgba(56,189,248,0.15); color:var(--accent2); }
 
-  .section {
-    margin-top: 12px;
+  .card-body {
+    max-height:0;
+    overflow:hidden;
+    transition: max-height 0.35s ease;
   }
+  .card-body.open { max-height:10000px; }
+
+  .detail-inner { padding:0 16px 16px; }
+
+  .section { margin-top:14px; }
   .section-title {
-    font-size: 12px;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.8px;
-    color: var(--accent2);
-    margin-bottom: 8px;
+    font-size:11px;
+    font-weight:700;
+    text-transform:uppercase;
+    letter-spacing:0.7px;
+    color:var(--accent2);
+    margin-bottom:8px;
+    display:flex;
+    align-items:center;
+    gap:6px;
   }
-  .section-title.gold { color: var(--gold); }
-  .section-title.green { color: var(--green); }
+  .section-title.gold { color:var(--gold); }
+  .section-title.green { color:var(--green); }
+  .section-title.rose { color:var(--rose); }
 
   .tactic-row {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 6px 0;
-    border-bottom: 1px solid rgba(255,255,255,0.05);
-    font-size: 14px;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    padding:5px 0;
+    border-bottom:1px solid rgba(255,255,255,0.04);
+    font-size:13px;
+    gap:8px;
   }
-  .tactic-row:last-child { border-bottom: none; }
-  .tactic-row .label { color: var(--text2); }
-  .tactic-row .value { font-weight: 600; text-align: right; }
+  .tactic-row:last-child { border-bottom:none; }
+  .tactic-row .label { color:var(--text2); flex-shrink:0; }
+  .tactic-row .value { font-weight:600; text-align:right; }
 
-  .formation-preview {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 16px;
+  .formation-display {
+    display:flex;
+    align-items:center;
+    gap:14px;
     background: var(--bg);
     border-radius: var(--radius-sm);
-    padding: 12px;
-    margin-bottom: 12px;
+    padding: 10px 14px;
+    margin-bottom: 10px;
   }
-  .formation-preview .pitch-label {
-    font-size: 26px;
-    font-weight: 800;
-    color: var(--accent);
-    letter-spacing: -1px;
-  }
-  .formation-preview .pitch-icon {
-    font-size: 36px;
-  }
+  .formation-display .icon { font-size:30px; }
+  .formation-display .label { font-size:22px; font-weight:800; color:var(--accent); letter-spacing:-0.5px; }
 
-  .player-types {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 6px;
-    margin-top: 4px;
+  .role-grid {
+    display:grid;
+    grid-template-columns: 1fr 1fr;
+    gap:5px;
   }
-  .player-chip {
-    background: var(--surface2);
-    padding: 4px 10px;
-    border-radius: 6px;
-    font-size: 12px;
-    color: var(--text);
+  .role-item {
+    background:var(--bg);
+    border-radius:6px;
+    padding:6px 8px;
+    font-size:12px;
   }
-  .player-chip .pos {
-    font-weight: 700;
-    color: var(--accent);
-    margin-right: 4px;
-  }
-  .player-chip .note {
-    color: var(--text2);
-    font-size: 11px;
-  }
+  .role-item .pos { font-weight:700; color:var(--accent2); }
+  .role-item .role { color:var(--text); }
+  .role-item .instr { color:var(--text2); font-size:11px; display:block; }
 
-  .pro-list {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 6px;
-    margin-top: 4px;
+  .playstyle-grid {
+    display:flex;
+    flex-wrap:wrap;
+    gap:4px;
   }
+  .ps-chip {
+    background:var(--surface2);
+    border-radius:4px;
+    padding:3px 7px;
+    font-size:11px;
+    color:var(--text);
+  }
+  .ps-chip .pos { font-weight:700; color:var(--gold); margin-right:3px; }
+
   .pro-chip {
-    background: linear-gradient(135deg, var(--gold), #f59e0b);
-    color: #0f172a;
-    padding: 3px 10px;
-    border-radius: 6px;
-    font-size: 12px;
-    font-weight: 700;
+    background:linear-gradient(135deg, var(--gold), #f59e0b);
+    color:#0f172a;
+    padding:2px 9px;
+    border-radius:5px;
+    font-size:11px;
+    font-weight:700;
+    display:inline-block;
+    margin:2px 4px 2px 0;
   }
+
+  .pros-cons {
+    display:grid;
+    grid-template-columns: 1fr 1fr;
+    gap:8px;
+  }
+  .pc-list { font-size:12px; line-height:1.6; }
+  .pc-list .item { display:flex; align-items:flex-start; gap:4px; }
+  .pc-list .check { color:var(--green); flex-shrink:0; }
+  .pc-list .cross { color:var(--rose); flex-shrink:0; }
+
+  .philosophy-text {
+    font-size:13px;
+    color:var(--text2);
+    line-height:1.6;
+    background:var(--bg);
+    border-radius:var(--radius-sm);
+    padding:10px 12px;
+  }
+  .philosophy-text strong { color:var(--text); }
 
   .bottom-nav {
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    background: var(--surface);
-    border-top: 1px solid var(--surface2);
-    display: flex;
-    padding: 8px 0;
-    padding-bottom: max(8px, env(safe-area-inset-bottom));
-    z-index: 100;
+    position:fixed;
+    bottom:0;
+    left:0;
+    right:0;
+    background:var(--surface);
+    border-top:1px solid var(--surface2);
+    display:flex;
+    padding:6px 0;
+    padding-bottom: max(6px, env(safe-area-inset-bottom));
+    z-index:100;
   }
   .nav-item {
-    flex: 1;
-    text-align: center;
-    font-size: 11px;
-    color: var(--text2);
-    cursor: pointer;
-    padding: 4px 0;
-    transition: color 0.2s;
-    -webkit-tap-highlight-color: transparent;
+    flex:1;
+    text-align:center;
+    font-size:11px;
+    color:var(--text2);
+    cursor:pointer;
+    padding:3px 0;
+    transition:color 0.2s;
+    -webkit-tap-highlight-color:transparent;
   }
-  .nav-item.active { color: var(--accent); }
-  .nav-item .icon { font-size: 22px; display: block; margin-bottom: 2px; }
+  .nav-item.active { color:var(--accent); }
+  .nav-item .icon { font-size:20px; display:block; margin-bottom:1px; }
 
-  .detail-view {
-    display: none;
-  }
-  .detail-view.active { display: block; }
+  .about-content { padding:8px 0; }
 
-  .back-btn {
-    display: inline-flex;
-    align-items: center;
-    gap: 4px;
-    font-size: 14px;
-    color: var(--accent2);
-    cursor: pointer;
-    margin-bottom: 12px;
-    -webkit-tap-highlight-color: transparent;
+  .update-card {
+    background:linear-gradient(135deg, #1e293b, #1a2332);
+    border:1px solid var(--surface2);
+    border-radius:var(--radius);
+    padding:14px;
+    margin-bottom:10px;
   }
+  .update-card .date { font-size:10px; color:var(--text2); text-transform:uppercase; letter-spacing:0.4px; }
+  .update-card .title { font-size:15px; font-weight:700; margin:3px 0 6px; }
+  .update-card .desc { font-size:13px; color:var(--text2); line-height:1.5; }
 
-  .patch-note {
-    background: linear-gradient(135deg, #1e293b, #1a2332);
-    border: 1px solid var(--surface2);
-    border-radius: var(--radius);
-    padding: 16px;
-    margin-bottom: 12px;
-  }
-  .patch-note .date {
-    font-size: 11px;
-    color: var(--text2);
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-  }
-  .patch-note .title {
-    font-size: 16px;
-    font-weight: 700;
-    margin: 4px 0 8px;
-  }
-  .patch-note .desc {
-    font-size: 14px;
-    color: var(--text2);
-    line-height: 1.5;
+  .code-block {
+    background:var(--bg);
+    border-radius:6px;
+    padding:6px 10px;
+    font-family:'SF Mono','Fira Code',monospace;
+    font-size:12px;
+    color:var(--accent2);
+    display:inline-block;
+    letter-spacing:0.3px;
+    margin:2px;
   }
 
-  @media (max-width: 380px) {
-    .header h1 { font-size: 19px; }
-    .card-header .name { font-size: 15px; }
+  @media (max-width:380px) {
+    .header h1 { font-size:19px; }
+    .card-header .name { font-size:15px; }
+    .role-grid { grid-template-columns:1fr; }
+    .pros-cons { grid-template-columns:1fr; }
   }
 </style>
 </head>
@@ -307,286 +314,378 @@
 
 <div class="header">
   <h1>Meta <span>Tactics</span></h1>
-  <div class="sub"><span class="dot"></span> FC26 — Post-TOTS Patch</div>
+  <div class="sub"><span class="dot"></span> FC26 — Post-TOTS Patch · Updated 19 May</div>
 </div>
 
 <div class="filters" id="filters">
-  <button class="filter-btn active" data-filter="all">All</button>
-  <button class="filter-btn" data-filter="meta">🔥 Meta</button>
+  <button class="filter-btn active" data-filter="all">All (9)</button>
+  <button class="filter-btn" data-filter="meta">🔥 Meta (6)</button>
   <button class="filter-btn" data-filter="defensive">Defensive</button>
   <button class="filter-btn" data-filter="attacking">Attacking</button>
   <button class="filter-btn" data-filter="narrow">Narrow</button>
   <button class="filter-btn" data-filter="wide">Wide</button>
 </div>
 
-<!-- Tactic List -->
-<div class="container" id="listView">
-  <div id="tacticList"></div>
-</div>
+<div class="container" id="listView"><div id="tacticList"></div></div>
 
-<!-- Detail View -->
 <div class="container" id="detailView" style="display:none">
-  <div class="back-btn" id="backBtn">← Back to tactics</div>
+  <div class="back-btn" id="backBtn" style="display:inline-flex;align-items:center;gap:4px;font-size:14px;color:var(--accent2);cursor:pointer;margin-bottom:10px;-webkit-tap-highlight-color:transparent;">← Back to tactics</div>
   <div id="detailContent"></div>
 </div>
 
-<!-- About View -->
 <div class="container">
-  <div class="detail-view" id="aboutView">
-    <div class="patch-note">
+  <div class="about-content" id="aboutView" style="display:none">
+    <div class="update-card">
       <div class="date">Post-TOTS Patch</div>
       <div class="title">FC26 Meta Landscape</div>
       <div class="desc">
-        These are the current meta formations and tactics used by top players and pros in FC26 after the latest TOTS patch.
-        Formations are ranked by community usage and pro adoption. Data sourced from Team Gullit, Dexerto, and community consensus.
+        These are the current meta formations and tactics used by top players and pros after the latest TOTS patch.<br><br>
+        Data compiled from Team Gullit, FUT.GG, FUTBIN, Dexerto, pro player breakdowns (Manuel Bachoore, Levi de Weerd), and community consensus.
       </div>
     </div>
-    <div class="patch-note">
+    <div class="update-card">
       <div class="date">Key Principle</div>
-      <div class="title">61 Depth Meta</div>
+      <div class="title">61 Depth / High Defensive Line</div>
       <div class="desc">
-        Most pro tactics use exactly <strong>61 depth</strong> with a "High" defensive approach. This activates aggressive AI defending — defenders push up, mark reliably, trigger auto-offside traps, and stay compact without being too exposed.
+        Most pro tactics use exactly <strong>61-70 depth</strong> with a "High" defensive approach. This activates aggressive AI defending — defenders push up, mark reliably, trigger auto-offside traps, and stay compact without being too exposed. A depth under 60 is generally not recommended in the current meta.
       </div>
     </div>
-    <div class="patch-note">
-      <div class="date">Player Roles Are Everything</div>
-      <div class="title">Roles & Playstyles</div>
+    <div class="update-card">
+      <div class="date">Key Principle</div>
+      <div class="title">Player Roles & FC IQ</div>
       <div class="desc">
-        Specific player roles (Inside Forward, Box-to-Box, Shadow Striker) and Playstyles (Incisive+, Intercept+, Quick Step+, Finesse+) are critical. Having the right roles activated makes or breaks a tactic in FC26.
+        Roles matter more than formation name in FC26. An Inside Forward behaves very differently from a Winger. A Deep-Lying Playmaker creates space differently from a Box-to-Box. Having the <strong>right role for the right player</strong> is critical — make sure your players have at least a + role rating for their position.<br><br>
+        The <strong>Balanced</strong> build-up style is the most versatile choice across almost all meta formations. It offers a mix of short passes, player runs, and quick transitions.
+      </div>
+    </div>
+    <div class="update-card">
+      <div class="date">Defending Tip</div>
+      <div class="title">Defend with Midfielders First</div>
+      <div class="desc">
+        The biggest mistake in FC26 is pulling your CBs out of position. Always <strong>control a CDM/CM first</strong>, jockey the ball carrier, cut passing lanes, and only switch to a CB when you're close to your box. Use manual interceptions (X/A) when your player is in a passing lane.
+      </div>
+    </div>
+    <div class="update-card">
+      <div class="date">Coin Priority</div>
+      <div class="title">Where to Spend First</div>
+      <div class="desc">
+        Before buying an expensive ST, upgrade: <strong>CDM with stamina + Intercept+</strong>, <strong>CB with Anticipate+</strong>, <strong>reliable Fullback</strong>. These positions stabilise your entire tactic.<br><br>
+        Key PlayStyles by priority: <strong>Rapid+</strong> (wingers), <strong>Incisive Pass+</strong> (CAM/CM), <strong>Intercept+</strong> (CDM/CB), <strong>Finesse Shot+</strong> (attackers), <strong>Quick Step+</strong> (wide players).
+      </div>
+    </div>
+    <div class="update-card">
+      <div class="date">Pro Tip</div>
+      <div class="title">Test Before You Judge</div>
+      <div class="desc">
+        Don't judge a tactic after one match — a stronger opponent or bad connection can distort the result. Play <strong>at least 5 matches</strong> (including 2 against similarly-ranked opponents) before changing formation. Change only <strong>one detail at a time</strong>.
       </div>
     </div>
   </div>
 </div>
 
-<!-- Bottom Navigation -->
 <div class="bottom-nav">
-  <div class="nav-item active" id="navTactics">
-    <span class="icon">📋</span>
-    Tactics
-  </div>
-  <div class="nav-item" id="navAbout">
-    <span class="icon">ℹ️</span>
-    About
-  </div>
+  <div class="nav-item active" id="navTactics"><span class="icon">📋</span>Tactics</div>
+  <div class="nav-item" id="navAbout"><span class="icon">ℹ️</span>About</div>
 </div>
 
 <script>
 const tactics = [
+  // ═══════════════════ 4-5-1 ═══════════════════
   {
-    id: '451',
-    name: '4-5-1',
-    short: '4-5-1 Flat',
-    meta: true,
-    tags: ['meta', 'defensive', 'wide'],
-    code: 'LZ$bkTLTVJ#N',
-    usage: "World Champion's choice — #1 meta",
-    pros: ['Manuel Bachoore'],
-    formationIcon: '4-5-1',
-    tactics: [
-      { label: 'Build-up Style', value: 'Balanced' },
-      { label: 'Defensive Approach', value: 'High (70)' },
-      { label: 'GK', value: 'Sweeper Keeper — Balanced' },
-      { label: 'LB/RB', value: 'Full Back — Balanced' },
-      { label: 'CBs', value: 'Defender — Defend' },
-      { label: 'CMs', value: 'Box-to-Box — Balanced' },
-      { label: 'LM', value: 'Inside Forward — Balanced' },
-      { label: 'RM', value: 'Inside Forward — Balanced' },
-      { label: 'ST', value: 'False 9 — Attack' }
+    id:'451', name:'4-5-1', short:'4-5-1 Flat', meta:true,
+    tags:['meta','defensive','wide'],
+    codes:['LZ$bkTLTVJ#N'],
+    usage:'World Champion Manuel Bachoore\'s #1',
+    formationIcon:'4-5-1',
+    pros:['Manuel Bachoore'],
+    roles:[
+      {pos:'GK', role:'Sweeper Keeper', instr:'Balanced'},
+      {pos:'LB/RB', role:'Fullback', instr:'Balanced'},
+      {pos:'CBs', role:'Defender', instr:'Defend'},
+      {pos:'CM (Middle)', role:'Deep-Lying Playmaker', instr:'Defend — deepest midfielder, first build-up reference'},
+      {pos:'CM (Right)', role:'Box-to-Box', instr:'Balanced — all-rounder'},
+      {pos:'CM (Left)', role:'Playmaker', instr:'Attack — most offensive, acts as extra attacker'},
+      {pos:'LM', role:'Inside Forward', instr:'Balanced — gets into box'},
+      {pos:'RM', role:'Inside Forward', instr:'Balanced — gets into box'},
+      {pos:'ST', role:'Advanced Forward', instr:'Attack'}
     ],
-    playerTypes: [
-      { pos: 'ST', note: 'False 9 — good passing/agility, drops deep' },
-      { pos: 'LM/RM', note: 'Pacey Inside Forwards, good dribbling' },
-      { pos: 'CM', note: 'Box-to-Box all-rounders, high stamina' },
-      { pos: 'CB', note: 'Intercept+, Anticipate+' },
-      { pos: 'GK', note: 'Sweeper Keeper with good passing' }
-    ]
+    playstyles:['GK: Footwork, Cross Claimer','CB: Anticipate, Block, Jockey','LB/RB: Quick Step, Intercept','CM (DLP): Incisive Pass, Pinged Pass','CM (B2B): Intercept, Press Proven','CM (Playmaker): Technical, Incisive Pass','LM/RM: Rapid, Finesse Shot','ST: Finesse Shot, Low Driven, Rapid'],
+    tactics:[
+      {label:'Build-up Style', value:'Balanced'},
+      {label:'Defensive Approach', value:'High (70)'},
+      {label:'Defensive Width', value:'Compact — close middle'}
+    ],
+    attack:'Build up on the side of your Box-to-Box midfielder (not the Playmaker). Use quick 1-2 touch passing (tiki-taka) to overload the box. Constantly trigger manual runs through the middle. Wingers run in behind, ST holds the backline, attacking CMs make late runs into the box for cutbacks.',
+    defense:'Primary goal is to close the middle of the pitch — allow the opponent to go wide if necessary. Wide midfielders track wide players carrying the ball down the line. Manually stop cutbacks. Never pull CBs or CMs out of position.',
+    strengths:['Best midfield control in the game','Highly adaptable — shifts to 4-3-3 and 4-2-3-1 in-game','Overloads the box from midfield','Excellent for tiki-taka build-up','World Champion-verified setup'],
+    weaknesses:['No dedicated CDM can leave gaps','Requires high-stamina CMs','Wide midfielders must track back','Takes practice to master the build-up patterns']
   },
+
+  // ═══════════════════ 4-4-1-1 ═══════════════════
   {
-    id: '4411',
-    name: '4-4-1-1',
-    short: '4-4-1-1 Midfield',
-    meta: true,
-    tags: ['meta', 'balanced', 'wide'],
-    code: 'BJbr#FRJL@?D',
-    usage: 'Most common formation post-patch',
-    pros: ['Multiple pros'],
-    formationIcon: '4-4-1-1',
-    tactics: [
-      { label: 'Build-up Style', value: 'Balanced' },
-      { label: 'Defensive Approach', value: 'High (70)' },
-      { label: 'GK', value: 'Sweeper Keeper — Balanced' },
-      { label: 'LB/RB', value: 'Full Back — Balanced' },
-      { label: 'CBs', value: 'Defender — Defend' },
-      { label: 'CAM', value: 'Shadow Striker — Attack' },
-      { label: 'CMs', value: 'Box-to-Box — Balanced' },
-      { label: 'LM', value: 'Inside Forward — Balanced' },
-      { label: 'RM', value: 'Winger — Balanced' },
-      { label: 'ST', value: 'Advanced Forward — Attack' }
+    id:'4411', name:'4-4-1-1', short:'4-4-1-1 Midfield', meta:true,
+    tags:['meta','balanced','wide'],
+    codes:['BJbr#FRJL@?D','BJbrPtrLL91C','7JV$CB7BF3nM'],
+    usage:'Most common formation in Champs post-patch',
+    formationIcon:'4-4-1-1',
+    pros:['Multiple pros — "the formation everyone is using"'],
+    roles:[
+      {pos:'GK', role:'Sweeper Keeper', instr:'Balanced'},
+      {pos:'LB/RB', role:'Fullback', instr:'Balanced'},
+      {pos:'CBs', role:'Defender', instr:'Defend'},
+      {pos:'CM (L)', role:'Box-to-Box', instr:'Balanced — makes runs beyond striker'},
+      {pos:'CM (R)', role:'Holding / DLP', instr:'Defend / Build-Up — pivot for build-up'},
+      {pos:'CAM', role:'Shadow Striker', instr:'Attack — scores as much as ST'},
+      {pos:'LM', role:'Inside Forward', instr:'Balanced'},
+      {pos:'RM', role:'Winger / Inside Forward', instr:'Balanced'},
+      {pos:'ST', role:'Advanced Forward', instr:'Attack'}
     ],
-    playerTypes: [
-      { pos: 'CAM', note: 'Incisive+ essential, good dribbling' },
-      { pos: 'CM', note: 'Box-to-Box — FUT Bday Joelinton, TOTS Szoboszlai type' },
-      { pos: 'LM/RM', note: 'Pacey, Finesse+ playstyle' },
-      { pos: 'ST', note: 'Advanced Forward — pace, Quick Step+' },
-      { pos: 'CB', note: 'Aggressive AI defenders' }
-    ]
+    playstyles:['CAM: Incisive Pass+, Finesse Shot+ — essential','CM (B2B): Intercept+, Press Proven, 85+ stamina','CM (DLP): Pinged Pass, Incisive Pass','LM/RM: Rapid+, Quick Step+, Finesse+','ST: Finesse Shot+, Low Driven+, Quick Step+','CB: Anticipate+, Intercept+, Jockey+'],
+    tactics:[
+      {label:'Build-up Style', value:'Balanced / Counter'},
+      {label:'Defensive Approach', value:'High (60-70)'},
+      {label:'Defensive Width', value:'Compact'},
+      {label:'Players in Box', value:'5-6 (overload)'}
+    ],
+    attack:'Inside Forwards (LM/RM) and Box-to-Box CMs push forward once you have the ball. This overloads the attack from the middle, giving passing options around the box. Great for drawing out AI presses. The CAM is the difference-maker — needs Incisive+ to dictate play. The playmaker CM makes runs beyond the striker and scores heavily.',
+    defense:'61 depth keeps the gap between CMs and CBs at a minimum. CAM drops in to pack the midfield when out of possession. DLP covers the space when wingback pushes forward. Both wide midfielders come back to form a compact defensive block.',
+    strengths:['Excellent attacking triangles all over the pitch','CAM and IFs score almost as much as ST','Compact midfield seals out defence','Versatile — suits tiki-taka or fast build-up','Late runs from midfield create chaos'],
+    weaknesses:['No dedicated DM can be exploited','Wingback can get caught out','Requires elite CAM with Incisive+','CMs need very high stamina']
   },
+
+  // ═══════════════════ 4-4-2 ═══════════════════
   {
-    id: '442',
-    name: '4-4-2',
-    short: '4-4-2 Flat',
-    meta: true,
-    tags: ['meta', 'balanced', 'wide'],
-    code: 'L5$VUvLTVJJN',
-    usage: 'Classic balanced meta',
-    pros: ['Manuel Bachoore', 'Levi de Weerd'],
-    formationIcon: '4-4-2',
-    tactics: [
-      { label: 'Build-up Style', value: 'Balanced' },
-      { label: 'Defensive Approach', value: 'High (70)' },
-      { label: 'GK', value: 'Ball Playing — Build-up' },
-      { label: 'LB/RB', value: 'Full Back — Balanced' },
-      { label: 'CBs', value: 'Defender — Defend' },
-      { label: 'CM (L)', value: 'Box-to-Box — Balanced' },
-      { label: 'CM (R)', value: 'Holding — Defend' },
-      { label: 'LM', value: 'Inside Forward — Balanced' },
-      { label: 'RM', value: 'Inside Forward — Balanced' },
-      { label: 'STs', value: 'Advanced Forward — Attack' }
+    id:'442', name:'4-4-2', short:'4-4-2 Flat', meta:true,
+    tags:['meta','balanced','wide','attacking'],
+    codes:['L5$VUvLTVJJN','t4Ht?T2z3ph8'],
+    usage:'Classic — World Champ Bachoore + Levi de Weerd',
+    formationIcon:'4-4-2',
+    pros:['Manuel Bachoore','Levi de Weerd'],
+    roles:[
+      {pos:'GK', role:'Ball Playing / Sweeper Keeper', instr:'Build-Up / Balanced'},
+      {pos:'LB/RB', role:'Fullback', instr:'Balanced'},
+      {pos:'CBs', role:'Defender', instr:'Defend'},
+      {pos:'CM (L)', role:'Box-to-Box / Holding', instr:'Balanced — engine'},
+      {pos:'CM (R)', role:'Holding / DLP', instr:'Defend — anchor'},
+      {pos:'LM', role:'Inside Forward', instr:'Attack — cut inside'},
+      {pos:'RM', role:'Inside Forward', instr:'Attack — cut inside'},
+      {pos:'ST (L)', role:'Advanced Forward', instr:'Attack'},
+      {pos:'ST (R)', role:'Target Forward / Advanced Forward', instr:'Balanced / Attack'}
     ],
-    playerTypes: [
-      { pos: 'ST', note: 'Two Advanced Forwards — pace + finishing' },
-      { pos: 'CM (L)', note: 'Box-to-Box engine, all-round' },
-      { pos: 'CM (R)', note: 'Stay-back defensive anchor' },
-      { pos: 'LM/RM', note: 'Inside Forward, cut inside threat' },
-      { pos: 'GK', note: 'Ball Playing GK for build-up' }
-    ]
+    playstyles:['GK: Footwork, Cross Claimer, Ball Playing','CM (B2B): Intercept+, Press Proven, 85+ stamina','CM (Anchor): Jockey, Intercept+, Pinged Pass','LM/RM: Rapid+, Quick Step+, Finesse+','STs: Finesse+, Low Driven+, Rapid+','CBs: Anticipate+, Intercept+, Block+'],
+    tactics:[
+      {label:'Build-up Style', value:'Balanced / Counter'},
+      {label:'Defensive Approach', value:'High (45-70)'},
+      {label:'Defensive Width', value:'40-45'},
+      {label:'Players in Box', value:'5-7'}
+    ],
+    attack:'Very attacking — both Inside Forwards cut inside and both STs push the backline. The key is the midfield duo: one B2B engine and one defensive anchor. They need elite stamina. Use quick transitions through the middle with 1-2 passes between strikers. The RM/LM provide width when fullbacks stay back.',
+    defense:'Midfield two means you need a lot of energy in the middle. Always defend with your CMs first — pulling a CB opens easy gaps. One CM stays back as a screen. Fullbacks on Balanced so they don\'t leave the backline exposed.',
+    strengths:['Two strikers — constant goal threat','Natural width from wide midfielders','Simple, adaptable system','Proven at World Champion level','Excellent for counter-attacks'],
+    weaknesses:['Midfield two can be overrun','CMs need elite stamina','Very attacking — can leave gaps','Needs strong all-round midfielders']
   },
+
+  // ═══════════════════ 4-2-3-1 Wide ═══════════════════
   {
-    id: '4231w',
-    name: '4-2-3-1 Wide',
-    short: '4-2-3-1 Wide',
-    meta: true,
-    tags: ['meta', 'defensive', 'wide'],
-    code: '6YSkAqqCE428',
-    usage: 'Safe balanced starter formation',
-    pros: ['Various'],
-    formationIcon: '4-2-3-1',
-    tactics: [
-      { label: 'Build-up Style', value: 'Balanced' },
-      { label: 'Defensive Approach', value: 'High (70)' },
-      { label: 'GK', value: 'Goalkeeper — Defend' },
-      { label: 'LB/RB', value: 'Full Back — Balanced' },
-      { label: 'CBs', value: 'Defender — Defend' },
-      { label: 'CDM (L)', value: 'Holding — Defend' },
-      { label: 'CDM (R)', value: 'Deep-Lying Playmaker — Build-Up' },
-      { label: 'CAM', value: 'Playmaker — Balanced' },
-      { label: 'LM', value: 'Inside Forward — Balanced' },
-      { label: 'RM', value: 'Inside Forward — Balanced' },
-      { label: 'ST', value: 'Advanced Forward — Attack' }
+    id:'4231w', name:'4-2-3-1 Wide', short:'4-2-3-1 Wide', meta:true,
+    tags:['meta','defensive','wide','balanced'],
+    codes:['6YSkAqqCE428'],
+    usage:'Safest defensive base — best for Rivals',
+    formationIcon:'4-2-3-1',
+    pros:['Recommended starting formation for most players'],
+    roles:[
+      {pos:'GK', role:'Goalkeeper / Sweeper Keeper', instr:'Defend / Balanced'},
+      {pos:'LB/RB', role:'Fullback', instr:'Defend — stay back'},
+      {pos:'CBs', role:'Defender', instr:'Defend'},
+      {pos:'CDM (L)', role:'Holding', instr:'Defend — pure anchor'},
+      {pos:'CDM (R)', role:'Deep-Lying Playmaker', instr:'Build-Up — link play'},
+      {pos:'CAM', role:'Playmaker', instr:'Build-Up — central link'},
+      {pos:'LM', role:'Inside Forward', instr:'Balanced'},
+      {pos:'RM', role:'Inside Forward', instr:'Balanced'},
+      {pos:'ST', role:'Advanced Forward', instr:'Attack — must be strong'}
     ],
-    playerTypes: [
-      { pos: 'ST', note: 'Strong striker — holds up play' },
-      { pos: 'CDM (L)', note: 'Pure defensive anchor' },
-      { pos: 'CDM (R)', note: 'DLP — passing/vision' },
-      { pos: 'CAM', note: 'Playmaker with good passing range' },
-      { pos: 'LM/RM', note: 'Inside Forward with pace' }
-    ]
+    playstyles:['CDM (Anchor): Intercept+, Jockey+, Bruiser+','CDM (DLP): Incisive Pass+, Pinged Pass+','CAM: Incisive Pass+, Technical+, Finesse+','LM/RM: Rapid+, Quick Step+','ST: Finesse+, Low Driven+, Quick Step+','CB: Anticipate+, Intercept+, Block+'],
+    tactics:[
+      {label:'Build-up Style', value:'Balanced / Short Passing'},
+      {label:'Defensive Approach', value:'Balanced (40-60) or High (70)'},
+      {label:'Defensive Width', value:'40-45'},
+      {label:'Offensive Width', value:'50'},
+      {label:'Players in Box', value:'4-6'}
+    ],
+    attack:'Lone ST has a lot of work — needs to link up with CAM and wingers. Diagonal switches to wide players stretch the defence. CAM acts as the creative hub. One CDM (DLP) joins attacks and makes late runs. Inside Forwards cut in for finesse shots or driven passes across the box.',
+    defense:'Two CDMs screen the backline — this is the safest defensive setup in the game. Lock one CDM into a covering role. Keep at least one fullback conservative. Always defend with CDMs first; only switch to CBs when close to the box. Cut passing lanes before tackling.',
+    strengths:['Safest defensive shape — 2 CDM screen','Excellent for Rivals consistency','Balanced — can go offensive or defensive','Good wide outlets under pressure','Covers central space perfectly'],
+    weaknesses:['Lone ST needs to be elite','Can lack attacking numbers in box','Requires good CDM passing','Wingers need to track back']
   },
+
+  // ═══════════════════ 4-2-1-3 ═══════════════════
   {
-    id: '4213',
-    name: '4-2-1-3',
-    short: '4-2-1-3',
-    meta: true,
-    tags: ['meta', 'attacking', 'wide'],
-    code: '',
-    usage: 'Fast counter-attacking option',
-    pros: ['Multiple pros'],
-    formationIcon: '4-2-1-3',
-    tactics: [
-      { label: 'Build-up Style', value: 'Balanced' },
-      { label: 'Defensive Approach', value: 'High (61)' },
-      { label: 'GK', value: 'Sweeper Keeper — Balanced' },
-      { label: 'LB/RB', value: 'Full Back — Balanced' },
-      { label: 'CDM (L)', value: 'Deep-Lying Playmaker — Build-Up' },
-      { label: 'CDM (R)', value: 'Holding — Defend' },
-      { label: 'CAM', value: 'Playmaker — Balanced' },
-      { label: 'LW', value: 'Inside Forward — Balanced' },
-      { label: 'RW', value: 'Inside Forward — Balanced' },
-      { label: 'ST', value: 'Advanced Forward — Attack' }
+    id:'4213', name:'4-2-1-3', short:'4-2-1-3', meta:true,
+    tags:['meta','attacking','wide'],
+    codes:['RZtRyXrXbt%T','&YQyNaQ6?wAD'],
+    usage:'Best balanced meta — fast counters',
+    formationIcon:'4-2-1-3',
+    pros:['Multiple pros — many top setups'],
+    roles:[
+      {pos:'GK', role:'Sweeper Keeper', instr:'Build-Up'},
+      {pos:'LB/RB', role:'Fullback', instr:'Defend'},
+      {pos:'CBs', role:'Defender', instr:'Defend'},
+      {pos:'RDM', role:'Holding', instr:'Defend — anchor'},
+      {pos:'LDM', role:'Deep-Lying Playmaker', instr:'Build-Up — box crasher when pushing'},
+      {pos:'CAM', role:'Playmaker', instr:'Balanced — link between CDMs and attack'},
+      {pos:'LW', role:'Inside Forward', instr:'Roaming / Attack'},
+      {pos:'RW', role:'Inside Forward', instr:'Roaming / Attack'},
+      {pos:'ST', role:'Advanced Forward', instr:'Attack'}
     ],
-    playerTypes: [
-      { pos: 'CDM', note: 'One DLP + one Holding — Intercept+' },
-      { pos: 'CAM', note: 'Playmaker, Incisive+ and Bruiser+' },
-      { pos: 'LW/RW', note: 'Quick Step+, Finesse+' },
-      { pos: 'ST', note: 'Advanced Forward, pace + finishing' }
-    ]
+    playstyles:['GK: Footwork, Cross Claimer','CB: Jockey, Block, Anticipate','RDM: Jockey, Intercept, Pinged Pass','LDM: Incisive Pass, Press Proven','CAM: Incisive Pass, Technical, Finesse Shot','LW/RW: Rapid, Technical, Low Driven Shot','ST: Finesse Shot, Low Driven, Rapid'],
+    tactics:[
+      {label:'Build-up Style', value:'Balanced / Counter'},
+      {label:'Defensive Approach', value:'High (61)'},
+      {label:'Defensive Width', value:'Compact'}
+    ],
+    attack:'Find wingers and ST with through balls and lobbed passes from midfield. Quick release to wide players then cut back for tap-ins. Play out from the back to the CAM who plays first-time through balls to beat the offside trap. The roaming Inside Forwards are crucial — they cut in for finesse shots or driven passes.',
+    defense:'Solid defensive screen from RCDM + backline maintains shape after losing the ball. Do NOT switch to CBs unless close to the box. Drag the pushing LDM back into position first. Use manual interceptions when cutting a passing lane. Never spam tackles — they take your player out of the game.',
+    strengths:['Excellent balance — attack and defence','Versatile wide players (cut inside or stretch)','Solid CDM screen','Great for quick transitions','Flexible for any playstyle'],
+    weaknesses:['Fullbacks on Defend can lack width','CDM positioning needs manual management','Requires pacey wingers','CAM needs to be elite'}
   },
+
+  // ═══════════════════ 4-3-3 (2) ═══════════════════
   {
-    id: '433',
-    name: '4-3-3 (2) Holding',
-    short: '4-3-3 (Holding)',
-    meta: true,
-    tags: ['meta', 'attacking', 'wide'],
-    code: '',
-    usage: 'Tighter defence, overloads box',
-    pros: ['Various'],
-    formationIcon: '4-3-3',
-    tactics: [
-      { label: 'Build-up Style', value: 'Balanced' },
-      { label: 'Defensive Approach', value: 'High (61)' },
-      { label: 'GK', value: 'Sweeper Keeper — Balanced' },
-      { label: 'LB/RB', value: 'Full Back — Balanced' },
-      { label: 'CBs', value: 'Defender — Defend' },
-      { label: 'CDM', value: 'Holding — Defend' },
-      { label: 'CM (L)', value: 'Box-to-Box — Balanced' },
-      { label: 'CM (R)', value: 'Box-to-Box — Balanced' },
-      { label: 'LW', value: 'Inside Forward — Balanced' },
-      { label: 'RW', value: 'Inside Forward — Balanced' },
-      { label: 'ST', value: 'Advanced Forward — Attack' }
+    id:'433', name:'4-3-3 (2)', short:'4-3-3 (Holding)', meta:true,
+    tags:['meta','defensive','wide'],
+    codes:['&QN&VeFK?Qg1'],
+    usage:'Tighter defence — overloads the box with AI protection',
+    formationIcon:'4-3-3',
+    pros:['Popular pro choice — strong against spinning'],
+    roles:[
+      {pos:'GK', role:'Sweeper Keeper', instr:'Balanced'},
+      {pos:'LB/RB', role:'Fullback / Attacking Wing-Back', instr:'Balanced / Versatile'},
+      {pos:'CBs', role:'Defender', instr:'Defend'},
+      {pos:'CDM', role:'Holding Midfielder / DLP', instr:'Defend / Build-Up — cover centre'},
+      {pos:'CM (L)', role:'Box-to-Box', instr:'Balanced — safety valve, launch passes'},
+      {pos:'CM (R)', role:'Box-to-Box', instr:'Balanced — extra body in the box'},
+      {pos:'LW', role:'Inside Forward', instr:'Balanced / Roaming'},
+      {pos:'RW', role:'Inside Forward', instr:'Balanced / Roaming'},
+      {pos:'ST', role:'Advanced Forward', instr:'Attack'}
     ],
-    playerTypes: [
-      { pos: 'CDM', note: 'Rock — TOTS Casemiro, WW Vieira type' },
-      { pos: 'CM (L)', note: 'Good defending + passing/dribbling' },
-      { pos: 'CM (R)', note: 'Ultimate B2B — De Jong, TOTS Sangaré' },
-      { pos: 'LW/RW', note: 'Quick Step+, Finesse+, Low Driven+' },
-      { pos: 'ST', note: 'Pacey Advanced Forward' }
-    ]
+    playstyles:['CDM: Intercept+, Jockey+, Pinged Pass+','CM (L): Incisive Pass+, Intercept+','CM (R): Intercept+, Press Proven, 90+ stamina','LW/RW: Rapid+, Finesse+, Quick Step+','ST: Finesse+, Low Driven+, Quick Step+','CB: Anticipate+, Intercept+','FB: Quick Step, Intercept'],
+    tactics:[
+      {label:'Build-up Style', value:'Balanced'},
+      {label:'Defensive Approach', value:'High (61)'},
+      {label:'Defensive Width', value:'Compact'}
+    ],
+    attack:'Similar to 4-4-1-1 but with more attacking presence. The single CDM drops between CBs when pushing forward, allowing fullbacks to push up. The two Box-to-Box CMs provide engine room — one is a safety valve (good passing/dribbling), the other is the ultimate B2B (De Jong/Sangaré type). Wingers cut inside for finesse/low-driven shots.',
+    defense:'The CDM provides an extra man next to CBs for cover — excellent against "spinning" tactics. Fullbacks can be set to Attacking Wing-Back for width (CDM covers). At 61 depth, AI defending is aggressive — defenders push up, mark reliably, do auto-offside traps.',
+    strengths:['Excellent defensive cover from CDM','Natural width from 3 forwards','Great against through-ball spammers','Versatile fullback options','Strong AI defending at 61 depth'],
+    weaknesses:['CDM must be elite (Casemiro/Vieira type)','CMs need huge stamina','Fullbacks can leave gaps','ST can be isolated without Inside Forwards']
   },
+
+  // ═══════════════════ 4-2-2-2 ═══════════════════
   {
-    id: '4222',
-    name: '4-2-2-2',
-    short: '4-2-2-2',
-    meta: false,
-    tags: ['attacking', 'narrow'],
-    code: 'ygL8b8k68wPy',
-    usage: 'More offensive than 4231',
-    pros: ['Various'],
-    formationIcon: '4-2-2-2',
-    tactics: [
-      { label: 'Build-up Style', value: 'Balanced' },
-      { label: 'Defensive Approach', value: 'Balanced (50)' },
-      { label: 'GK', value: 'Sweeper Keeper — Balanced' },
-      { label: 'LB/RB', value: 'Full Back — Balanced' },
-      { label: 'CBs', value: 'Defender — Defend' },
-      { label: 'CDMs', value: 'Deep-Lying Playmaker — Build-Up' },
-      { label: 'CAM (L)', value: 'Playmaker — Roaming' },
-      { label: 'CAM (R)', value: 'Shadow Striker — Attack' },
-      { label: 'STs', value: 'Advanced Forward — Attack' }
+    id:'4222', name:'4-2-2-2', short:'4-2-2-2', meta:false,
+    tags:['attacking','narrow'],
+    codes:['ygL8b8k68wPy','zgM9UdP79xPT'],
+    usage:'More offensive than 4231 — creative 2-CAM setup',
+    formationIcon:'4-2-2-2',
+    pros:['Favoured by creative players'],
+    roles:[
+      {pos:'GK', role:'Sweeper Keeper', instr:'Balanced'},
+      {pos:'LB/RB', role:'Fullback', instr:'Defend / Balanced'},
+      {pos:'CBs', role:'Defender', instr:'Defend'},
+      {pos:'CDM (L)', role:'Holding / Defend', instr:'Stay back, cover centre'},
+      {pos:'CDM (R)', role:'Box Crasher / DLP', instr:'Balanced / Build-Up — joins attack'},
+      {pos:'CAM (L)', role:'Playmaker', instr:'Roaming — dictating play'},
+      {pos:'CAM (R)', role:'Shadow Striker', instr:'Attack — goalscoring threat'},
+      {pos:'ST (L)', role:'Target Forward / False 9', instr:'Balanced / Build-Up — link play'},
+      {pos:'ST (R)', role:'Advanced Forward', instr:'Attack'}
     ],
-    playerTypes: [
-      { pos: 'ST', note: 'Advanced Forward + False 9 combo' },
-      { pos: 'CAM', note: 'One roaming Playmaker, one Shadow Striker' },
-      { pos: 'CDM', note: 'Both DLPs — passing essential' }
-    ]
+    playstyles:['CDM (Anchor): Intercept+, Jockey+, Bruiser+','CDM (DLP): Incisive Pass+, Pinged Pass+','CAM (Playmaker): Technical, Incisive Pass, Finesse Shot','CAM (Shadow): Finesse+, Rapid+, Low Driven+','ST: Finesse+, Low Driven+, Quick Step+','CB: Anticipate+, Intercept+'],
+    tactics:[
+      {label:'Build-up Style', value:'Balanced / Short Passing'},
+      {label:'Defensive Approach', value:'Balanced (40-50) / High (61)'},
+      {label:'Defensive Width', value:'Compact'},
+      {label:'Players in Box', value:'5-7'}
+    ],
+    attack:'Quick 1-2 passing between CAMs and STs is the key. One ST drops as False 9 to create space, the other runs in behind. One CAM roams to create, the other attacks the box (Shadow Striker). CDM (Box Crasher) joins as an extra striker when pushing. Needs creative players who can combine quickly.',
+    defense:'Two CDMs provide a solid base. Defend with CDMs first — absorb pressure, cut passing lanes. One CDM stays back at all times. Fullbacks on Defend / Balanced so they don\'t leave the 2v2 wide exposed. Compact defensive shape makes it hard to play through the middle.',
+    strengths:['Creative 2-CAM system','Excellent quick-passing combinations','Good central overloads','False 9 pulls defenders out','Two CDMs = defensive solidity'],
+    weaknesses:['No natural width','Fullbacks exposed without wingers','Requires creative CAMs','Can be narrow against wide formations']
+  },
+
+  // ═══════════════════ 4-1-2-1-2 Narrow ═══════════════════
+  {
+    id:'41212', name:'4-1-2-1-2 Narrow', short:'4-1-2-1-2 Narrow', meta:false,
+    tags:['attacking','narrow'],
+    codes:['twGr2xF13rxN'],
+    usage:'Midfield dominance — overload the centre',
+    formationIcon:'4-1-2-1-2',
+    pros:['Strong narrow option'],
+    roles:[
+      {pos:'GK', role:'Goalkeeper', instr:'Defend'},
+      {pos:'LB/RB', role:'Fullback', instr:'Defend — vital, only width'},
+      {pos:'CBs', role:'Defender', instr:'Defend'},
+      {pos:'CDM', role:'Holding', instr:'Defend — midfield anchor'},
+      {pos:'CM (L)', role:'Box-to-Box', instr:'Balanced'},
+      {pos:'CM (R)', role:'Box-to-Box', instr:'Balanced'},
+      {pos:'CAM', role:'Classic 10', instr:'Attack — creative hub'},
+      {pos:'ST (L)', role:'Target Forward', instr:'Attack — hold-up play'},
+      {pos:'ST (R)', role:'Advanced Forward', instr:'Attack'}
+    ],
+    playstyles:['CDM: Intercept+, Jockey+, Pinged Pass+','CMs: Intercept+, Press Proven, 90+ stamina','CAM: Incisive Pass+, Technical+, Finesse+','ST: Finesse+, Low Driven+, Quick Step+','FB: Rapid+, Intercept+ — crucial for width'],
+    tactics:[
+      {label:'Build-up Style', value:'Counter'},
+      {label:'Defensive Approach', value:'Balanced (60)'},
+      {label:'Defensive Width', value:'Compact'}
+    ],
+    attack:'Packs the midfield — CAM + 2 strikers makes it easy to open defences with quick passes. Fullbacks provide the ONLY width — essential they push up but have the stamina to recover. Classic 10 CAM dictates the attack. Two strikers can combine for 1-2s through the middle.',
+    defense:'Packing the midfield makes you tough to play through. The real weakness is wide — fullbacks are under immense pressure. Fullbacks must be comfortable on the ball AND putting in tackles. Hakimi/Nuno Mendes type is ideal. CDM screens the backline.',
+    strengths:['Midfield overload — tough to play through','CAM + 2 STs = constant attacking threat','Excellent for quick passing combinations','Compact = hard to break down centrally','Strong press potential'],
+    weaknesses:['ZERO natural width','Fullbacks under huge pressure','Vulnerable to wide formations','Requires elite fullbacks','CMs need massive stamina']
+  },
+
+  // ═══════════════════ 4-2-3-1 (2) ═══════════════════
+  {
+    id:'4231v2', name:'4-2-3-1 (2)', short:'4-2-3-1 (2) Narrow', meta:false,
+    tags:['defensive','narrow'],
+    codes:['nY@RurZvx$En'],
+    usage:'Alternative defensive setup — narrow variant',
+    formationIcon:'4-2-3-1',
+    pros:['Various'],
+    roles:[
+      {pos:'GK', role:'Sweeper Keeper', instr:'Balanced'},
+      {pos:'LB/RB', role:'Fullback', instr:'Balanced'},
+      {pos:'CBs', role:'Defender', instr:'Defend'},
+      {pos:'CDMs', role:'Deep-Lying Playmaker', instr:'Build-Up — both'},
+      {pos:'LM', role:'Inside Forward', instr:'Balanced'},
+      {pos:'RM', role:'Winger', instr:'Balanced'},
+      {pos:'CAM', role:'Shadow Striker', instr:'Attack'},
+      {pos:'ST', role:'Advanced Forward', instr:'Attack'}
+    ],
+    playstyles:['CDMs: Incisive Pass+, Pinged Pass+','CAM: Finesse+, Rapid+, Incisive+','LM/RM: Rapid+, Quick Step+','ST: Low Driven+, Finesse+, Quick Step+','CB: Anticipate+, Intercept+'],
+    tactics:[
+      {label:'Build-up Style', value:'Balanced'},
+      {label:'Defensive Approach', value:'Balanced (50)'},
+      {label:'Defensive Width', value:'Compact'}
+    ],
+    attack:'Both CDMs as Deep-Lying Playmakers means excellent build-up play from deep. CAM as Shadow Striker provides the main goal threat from midfield. LM as Inside Forward cuts in, RM as Winger stretches play. Relies on the ST to occupy defenders while the CAM and IF arrive late.',
+    defense:'Two DLP CDMs can push up — you need to manually manage their positioning. Compact shape makes it hard to play through the middle. Fullbacks on Balanced provide support without overcommitting.',
+    strengths:['Excellent build-up from deep','Shadow Striker CAM = goals','Compact defensive shape','Flexible wide options'],
+    weaknesses:['CDMs can push too high','Narrow in attack','ST isolated without wide support','Requires manual CDM management']
   }
 ];
 
 // ─── STATE ────────────────────────
 let currentFilter = 'all';
+let openCard = null;
 
 function getFiltered(tag) {
   if (tag === 'all') return tactics;
   return tactics.filter(t => t.tags.includes(tag));
+}
+
+function formatCodes(codes) {
+  if (!codes || codes.length === 0 || (codes.length === 1 && !codes[0])) return '';
+  return codes.map(c => `<span class="code-block">${c}</span>`).join(' ');
 }
 
 // ─── RENDER LIST ──────────────────
@@ -594,112 +693,167 @@ function renderList(filter) {
   currentFilter = filter;
   const el = document.getElementById('tacticList');
   const items = getFiltered(filter);
+  openCard = null;
 
   document.querySelectorAll('.filter-btn').forEach(b => {
     b.classList.toggle('active', b.dataset.filter === filter);
   });
 
   if (!items.length) {
-    el.innerHTML = `<div class="empty-state"><div class="icon">🔍</div><h3>No tactics found</h3></div>`;
+    el.innerHTML = `<div style="text-align:center;padding:50px 20px;color:var(--text2);">
+      <div style="font-size:40px;margin-bottom:10px;">🔍</div>
+      <h3 style="font-size:18px;margin-bottom:4px;">No tactics found</h3>
+      <p style="font-size:14px;">Try a different filter</p>
+    </div>`;
     return;
   }
 
   el.innerHTML = items.map(t => {
-    const codeHtml = t.code ? `<div class="code-badge">${t.code}</div>` : '';
     const metaHtml = t.meta ? '<span class="meta-tag">🔥 Meta</span>' : '';
-    return `<div class="tactic-card" onclick="openDetail('${t.id}')">
+    const codeHtml = t.codes.length > 0 && t.codes[0] ? `<div class="code-badge">${t.codes[0]}</div>` : '';
+    const tagHtml = t.tags.slice(0,3).map(tg => {
+      const cls = tg === 'meta' ? 'gold' : tg === 'attacking' ? 'rose' : tg === 'defensive' ? 'blue' : tg === 'wide' ? 'green' : '';
+      return `<span class="tag ${cls}">${tg}</span>`;
+    }).join('');
+    return `<div class="tactic-card" onclick="toggleCard('${t.id}')">
       <div class="card-header">
-        <div class="left">
-          <div class="name">${t.name} ${metaHtml}</div>
-          <div class="usage">${t.usage}</div>
+        <div class="top-row">
+          <div>
+            <div class="name">${t.name} ${metaHtml}</div>
+            <div class="usage">${t.usage}</div>
+            <div class="tags">${tagHtml}</div>
+          </div>
+          ${codeHtml}
         </div>
-        ${codeHtml}
+      </div>
+      <div class="card-body" id="body-${t.id}">
+        <div class="detail-inner">
+          ${renderDetailInner(t)}
+        </div>
       </div>
     </div>`;
   }).join('');
 }
 
-// ─── RENDER DETAIL ────────────────
-function openDetail(id) {
-  const t = tactics.find(x => x.id === id);
-  if (!t) return;
-
-  document.getElementById('listView').style.display = 'none';
-  document.getElementById('detailView').style.display = 'block';
-
-  const metaHtml = t.meta ? '<span class="meta-tag" style="font-size:10px;margin-left:6px;">🔥 Meta</span>' : '';
-  const codeHtml = t.code ? `<div class="code-badge">${t.code}</div>` : '';
+// ─── RENDER DETAIL INNER (shared between list + full view) ──
+function renderDetailInner(t) {
+  const codesHtml = formatCodes(t.codes);
   const prosHtml = t.pros.map(p => `<span class="pro-chip">${p}</span>`).join('');
-  const playerHtml = t.playerTypes.map(p =>
-    `<div class="player-chip"><span class="pos">${p.pos}</span>${p.note}</div>`
-  ).join('');
+  const psHtml = t.playstyles.map(p => `<span class="ps-chip">${p}</span>`).join('');
   const tacticRows = t.tactics.map(r =>
     `<div class="tactic-row"><span class="label">${r.label}</span><span class="value">${r.value}</span></div>`
   ).join('');
+  const roleHtml = t.roles.map(r =>
+    `<div class="role-item"><span class="pos">${r.pos}</span> <span class="role">${r.role}</span>${r.instr ? `<span class="instr">→ ${r.instr}</span>` : ''}</div>`
+  ).join('');
+  const strengthsHtml = t.strengths.map(s =>
+    `<div class="item"><span class="check">✅</span> ${s}</div>`
+  ).join('');
+  const weakHtml = t.weaknesses.map(w =>
+    `<div class="item"><span class="cross">⚠️</span> ${w}</div>`
+  ).join('');
 
-  document.getElementById('detailContent').innerHTML = `
-    <div class="tactic-card" style="border-color:${t.meta ? 'var(--gold)' : 'var(--surface2)'}">
-      <div style="padding:16px;">
-        <div class="formation-preview">
-          <div class="pitch-icon">⚽</div>
-          <div class="pitch-label">${t.formationIcon}</div>
-        </div>
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
-          <div>
-            <div style="font-size:20px;font-weight:700;">${t.name} ${metaHtml}</div>
-            <div style="font-size:13px;color:var(--text2);margin-top:2px;">${t.short}</div>
-          </div>
-          ${codeHtml}
-        </div>
+  const metaBorder = t.meta ? 'style="border-color:var(--gold);"' : '';
 
-        <div class="section">
-          <div class="section-title gold">📋 Custom Tactics</div>
-          ${tacticRows}
-        </div>
+  return `
+    <div class="formation-display">
+      <div class="icon">⚽</div>
+      <div class="label">${t.formationIcon}</div>
+    </div>
 
-        <div class="section">
-          <div class="section-title">🎯 Player Types</div>
-          <div class="player-types">${playerHtml}</div>
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+      <div>
+        <div style="font-size:18px;font-weight:700;">
+          ${t.name}
+          ${t.meta ? '<span class="meta-tag" style="font-size:10px;margin-left:6px;">🔥 Meta</span>' : ''}
         </div>
-
-        <div class="section" style="margin-bottom:4px;">
-          <div class="section-title green">🏆 Used By</div>
-          <div class="pro-list">${prosHtml}</div>
-        </div>
+        <div style="font-size:12px;color:var(--text2);margin-top:1px;">${t.short}</div>
       </div>
-    </div>`;
+      ${codesHtml ? `<div>${codesHtml}</div>` : ''}
+    </div>
+
+    <div class="section">
+      <div class="section-title gold">📋 Custom Tactics</div>
+      ${tacticRows}
+    </div>
+
+    <div class="section">
+      <div class="section-title">⚙️ Player Roles & Instructions</div>
+      <div class="role-grid">${roleHtml}</div>
+    </div>
+
+    <div class="section">
+      <div class="section-title gold">🎯 Recommended PlayStyles</div>
+      <div class="playstyle-grid">${psHtml}</div>
+    </div>
+
+    <div class="section">
+      <div class="section-title green">⚔️ Attack Philosophy</div>
+      <div class="philosophy-text">${t.attack}</div>
+    </div>
+
+    <div class="section">
+      <div class="section-title">🛡️ Defence Philosophy</div>
+      <div class="philosophy-text">${t.defense}</div>
+    </div>
+
+    <div class="section">
+      <div class="section-title">📊 Pros & Cons</div>
+      <div class="pros-cons">
+        <div class="pc-list">${strengthsHtml}</div>
+        <div class="pc-list">${weakHtml}</div>
+      </div>
+    </div>
+
+    <div class="section" style="margin-bottom:4px;">
+      <div class="section-title green">🏆 Used By</div>
+      ${prosHtml}
+    </div>
+  `;
 }
 
-function closeDetail() {
-  document.getElementById('detailView').style.display = 'none';
-  document.getElementById('listView').style.display = 'block';
+// ─── TOGGLE CARD ──────────────────
+function toggleCard(id) {
+  const body = document.getElementById('body-' + id);
+  if (!body) return;
+
+  if (openCard === id) {
+    body.classList.remove('open');
+    openCard = null;
+  } else {
+    if (openCard) {
+      const prev = document.getElementById('body-' + openCard);
+      if (prev) prev.classList.remove('open');
+    }
+    body.classList.add('open');
+    openCard = id;
+  }
 }
 
 // ─── VIEW SWITCHING ──────────────
-function showTactics() {
-  document.getElementById('listView').style.display = 'block';
-  document.getElementById('detailView').style.display = 'none';
-  document.getElementById('aboutView').classList.remove('active');
-  document.getElementById('navTactics').classList.add('active');
-  document.getElementById('navAbout').classList.remove('active');
-}
-
-function showAbout() {
-  document.getElementById('listView').style.display = 'none';
-  document.getElementById('detailView').style.display = 'none';
-  document.getElementById('aboutView').classList.add('active');
-  document.getElementById('navTactics').classList.remove('active');
-  document.getElementById('navAbout').classList.add('active');
-}
-
-// ─── INIT ─────────────────────────
 document.querySelectorAll('.filter-btn').forEach(btn => {
   btn.addEventListener('click', () => renderList(btn.dataset.filter));
 });
-document.getElementById('backBtn').addEventListener('click', closeDetail);
-document.getElementById('navTactics').addEventListener('click', showTactics);
-document.getElementById('navAbout').addEventListener('click', showAbout);
+document.getElementById('backBtn').addEventListener('click', () => {
+  document.getElementById('detailView').style.display = 'none';
+  document.getElementById('listView').style.display = 'block';
+});
+document.getElementById('navTactics').addEventListener('click', () => {
+  document.getElementById('listView').style.display = 'block';
+  document.getElementById('detailView').style.display = 'none';
+  document.getElementById('aboutView').style.display = 'none';
+  document.getElementById('navTactics').classList.add('active');
+  document.getElementById('navAbout').classList.remove('active');
+});
+document.getElementById('navAbout').addEventListener('click', () => {
+  document.getElementById('listView').style.display = 'none';
+  document.getElementById('detailView').style.display = 'none';
+  document.getElementById('aboutView').style.display = 'block';
+  document.getElementById('navTactics').classList.remove('active');
+  document.getElementById('navAbout').classList.add('active');
+});
 
+// ─── INIT ─────────────────────────
 renderList('all');
 </script>
 </body>
