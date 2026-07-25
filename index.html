@@ -246,7 +246,7 @@
                 <div class="upload-grid">
                     <div class="upload-box">
                         <h3>1. Badge / Frame</h3>
-                        <p>Top layer with transparent centre opening</p>
+                        <p>Frame or template background</p>
                         <input type="file" id="templateUpload" accept="image/*" style="width: 100%;" />
                     </div>
                     <div class="upload-box">
@@ -257,7 +257,7 @@
                 </div>
             </div>
 
-            <p class="tip">💡 Correct model: face image underneath, badge/frame on top, no photo visible beyond the badge edge.</p>
+            <p class="tip">💡 Correct model: template first, face clipped into the circle, protected from the frame edge.</p>
 
             <div class="panel canvas-wrap">
                 <canvas id="imageCanvas" width="400" height="400"></canvas>
@@ -479,12 +479,12 @@
         function drawCanvas(includeGuide = true) {
             context.clearRect(0, 0, canvas.width, canvas.height);
 
-            if (faceImg) {
-                drawFaceLayer();
-            }
-
             if (badgeImg) {
                 context.drawImage(badgeImg, 0, 0, canvas.width, canvas.height);
+            }
+
+            if (faceImg) {
+                drawFaceLayer();
             }
 
             if (showGuide && includeGuide) {
@@ -530,11 +530,6 @@
                 offCtx.beginPath();
                 offCtx.arc(openingCenter.x, openingCenter.y, radius, 0, Math.PI * 2);
                 offCtx.fill();
-            }
-
-            if (badgeImg) {
-                offCtx.globalCompositeOperation = 'destination-out';
-                offCtx.drawImage(badgeImg, 0, 0, canvas.width, canvas.height);
             }
 
             offCtx.globalCompositeOperation = 'source-over';
