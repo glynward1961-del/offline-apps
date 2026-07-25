@@ -286,6 +286,15 @@
                 </div>
 
                 <div class="control-group">
+                    <div class="control-header">
+                        <label for="safeEdgeSlider">Frame Protection</label>
+                        <span class="value-label" id="safeEdgeValue">10 px</span>
+                    </div>
+                    <input type="range" id="safeEdgeSlider" min="0" max="30" value="10" />
+                    <div class="helper">Pulls the photo inside the frame so it cannot cover edge pixels.</div>
+                </div>
+
+                <div class="control-group">
                     <div class="toggle-row">
                         <label for="showGuideToggle">Show Guide Ring</label>
                         <input type="checkbox" id="showGuideToggle" checked />
@@ -352,11 +361,13 @@
         const zoomOutBtn = document.getElementById('zoomOutBtn');
         const maskRadiusSlider = document.getElementById('maskRadiusSlider');
         const featherSlider = document.getElementById('featherSlider');
+        const safeEdgeSlider = document.getElementById('safeEdgeSlider');
         const showGuideToggle = document.getElementById('showGuideToggle');
         const centerMaskBtn = document.getElementById('centerMaskBtn');
         const balancePhotoBtn = document.getElementById('balancePhotoBtn');
         const maskRadiusValue = document.getElementById('maskRadiusValue');
         const featherValue = document.getElementById('featherValue');
+        const safeEdgeValue = document.getElementById('safeEdgeValue');
 
         let badgeImg = null;
         let faceImg = null;
@@ -364,6 +375,7 @@
         let faceScale = 1;
         let openingRadius = 95;
         let edgeSoftness = 0;
+        let safeEdgeInset = 10;
         let showGuide = true;
         let openingCenter = { x: canvas.width / 2, y: canvas.height / 2 };
 
@@ -390,6 +402,12 @@
 
         featherSlider.addEventListener('input', (e) => {
             edgeSoftness = parseInt(e.target.value, 10);
+            updateReadouts();
+            drawCanvas();
+        });
+
+        safeEdgeSlider.addEventListener('input', (e) => {
+            safeEdgeInset = parseInt(e.target.value, 10);
             updateReadouts();
             drawCanvas();
         });
@@ -424,6 +442,7 @@
         function updateReadouts() {
             maskRadiusValue.textContent = `${openingRadius} px`;
             featherValue.textContent = `${edgeSoftness} px`;
+            safeEdgeValue.textContent = `${safeEdgeInset} px`;
         }
 
         function handleBadgeUpload(event) {
@@ -474,23 +493,7 @@
         }
 
         function drawFaceLayer() {
-            const radius = Math.max(10, openingRadius);
-
-            if (edgeSoftness <= 0) {
-                context.save();
-                context.beginPath();
-                context.arc(openingCenter.x, openingCenter.y, radius, 0, Math.PI * 2);
-                context.clip();
-                context.drawImage(
-                    faceImg,
-                    facePosition.x,
-                    facePosition.y,
-                    faceImg.width * faceScale,
-                    faceImg.height * faceScale
-                );
-                context.restore();
-                return;
-            }
+            const radius = Math.max(10, openingRadius - safeEdgeInset);
 
             const offscreen = document.createElement('canvas');
             offscreen.width = canvas.width;
@@ -510,22 +513,30 @@
             );
             offCtx.restore();
 
-            offCtx.globalCompositeOperation = 'destination-in';
-            const featherStart = Math.max(0, radius - edgeSoftness);
-            const gradient = offCtx.createRadialGradient(
-                openingCenter.x,
-                openingCenter.y,
-                featherStart,
-                openingCenter.x,
-                openingCenter.y,
-                radius
-            );
-            gradient.addColorStop(0, 'rgba(0,0,0,1)');
-            gradient.addColorStop(1, 'rgba(0,0,0,0)');
-            offCtx.fillStyle = gradient;
-            offCtx.beginPath();
-            offCtx.arc(openingCenter.x, openingCenter.y, radius, 0, Math.PI * 2);
-            offCtx.fill();
+            if (edgeSoftness > 0) {
+                offCtx.globalCompositeOperation = 'destination-in';
+                const featherStart = Math.max(0, radius - edgeSoftness);
+                const gradient = offCtx.createRadialGradient(
+                    openingCenter.x,
+                    openingCenter.y,
+                    featherStart,
+                    openingCenter.x,
+                    openingCenter.y,
+                    radius
+                );
+                gradient.addColorStop(0, 'rgba(0,0,0,1)');
+                gradient.addColorStop(1, 'rgba(0,0,0,0)');
+                offCtx.fillStyle = gradient;
+                offCtx.beginPath();
+                offCtx.arc(openingCenter.x, openingCenter.y, radius, 0, Math.PI * 2);
+                offCtx.fill();
+            }
+
+            if (badgeImg) {
+                offCtx.globalCompositeOperation = 'destination-out';
+                offCtx.drawImage(badgeImg, 0, 0, canvas.width, canvas.height);
+            }
+
             offCtx.globalCompositeOperation = 'source-over';
 
             context.drawImage(offscreen, 0, 0, canvas.width, canvas.height);
@@ -594,11 +605,13 @@
             faceScale = 1;
             openingRadius = 95;
             edgeSoftness = 0;
+            safeEdgeInset = 10;
             showGuide = true;
             openingCenter = { x: canvas.width / 2, y: canvas.height / 2 };
             isDraggingFace = false;
             maskRadiusSlider.value = 95;
             featherSlider.value = 0;
+            safeEdgeSlider.value = 10;
             showGuideToggle.checked = true;
             updateReadouts();
             drawCanvas();
