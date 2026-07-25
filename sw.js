@@ -1,4 +1,4 @@
-const CACHE_NAME = 'compositor-cache-v4';
+const CACHE_NAME = 'compositor-cache-v5';
 const urlsToCache = [
   './',
   './index.html',
@@ -30,6 +30,19 @@ self.addEventListener('activate', event => {
 });
 
 self.addEventListener('fetch', event => {
+  if (event.request.mode === 'navigate' || event.request.destination === 'document') {
+    event.respondWith(
+      fetch(event.request, { cache: 'no-store' })
+        .then(response => {
+          const copy = response.clone();
+          caches.open(CACHE_NAME).then(cache => cache.put(event.request, copy));
+          return response;
+        })
+        .catch(() => caches.match(event.request).then(response => response || caches.match('./index.html')))
+    );
+    return;
+  }
+
   event.respondWith(
     caches.match(event.request)
       .then(response => {
