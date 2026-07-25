@@ -457,7 +457,7 @@
             drawCanvas();
         }
 
-        function drawCanvas() {
+        function drawCanvas(includeGuide = true) {
             context.clearRect(0, 0, canvas.width, canvas.height);
 
             if (faceImg) {
@@ -468,7 +468,7 @@
                 context.drawImage(badgeImg, 0, 0, canvas.width, canvas.height);
             }
 
-            if (showGuide) {
+            if (showGuide && includeGuide) {
                 drawGuideRing();
             }
         }
@@ -576,11 +576,12 @@
                 alert('Nothing to download yet!');
                 return;
             }
-            drawCanvas();
+            drawCanvas(false);
             const link = document.createElement('a');
             link.download = 'composed-image.png';
             link.href = canvas.toDataURL('image/png');
             link.click();
+            drawCanvas();
         }
 
         function resetCanvas() {

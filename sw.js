@@ -1,4 +1,4 @@
-const CACHE_NAME = 'compositor-cache-v1';
+const CACHE_NAME = 'compositor-cache-v2';
 const urlsToCache = [
   './',
   './index.html',
@@ -15,6 +15,18 @@ self.addEventListener('install', event => {
         return cache.addAll(urlsToCache);
       })
   );
+  self.skipWaiting();
+});
+
+self.addEventListener('activate', event => {
+  event.waitUntil(
+    caches.keys().then(cacheNames => Promise.all(
+      cacheNames
+        .filter(cacheName => cacheName !== CACHE_NAME)
+        .map(cacheName => caches.delete(cacheName))
+    ))
+  );
+  self.clients.claim();
 });
 
 self.addEventListener('fetch', event => {
